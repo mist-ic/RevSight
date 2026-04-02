@@ -1,0 +1,48 @@
+# Research & Planning docs (not part of shipped product)
+Plan.md
+Context.md
+ResearchAnswers.md
+RevSightResearch.md
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+*.egg
+.venv/
+venv/
+env/
+.env
+.env.local
+
+# uv
+.uv/
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+.vercel
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Docker
+*.log
+
+# Gemini
+.gemini/

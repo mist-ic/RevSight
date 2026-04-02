@@ -1,0 +1,35 @@
+[project]
+name = "revsight-backend"
+version = "0.1.0"
+description = "RevSight — Revenue Command Copilot backend"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.34.0",
+    "psycopg[binary]>=3.2.0",
+    "langgraph>=0.3.0",
+    "langchain-core>=0.3.0",
+    "langchain-openai>=0.3.0",
+    "pydantic-ai>=0.2.0",
+    "logfire>=3.0.0",
+    "litellm>=1.60.0",
+    "python-dotenv>=1.0.0",
+    "deepeval>=2.0.0",
+    "faker>=37.0.0",
+    "asyncpg>=0.30.0",
+    "httpx>=0.28.0",
+    "sse-starlette>=2.2.0",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["app"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv]
+dev-dependencies = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.25.0",
+]
