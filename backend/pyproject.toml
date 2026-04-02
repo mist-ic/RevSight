@@ -15,6 +15,7 @@ dependencies = [
     "litellm>=1.60.0",
     "python-dotenv>=1.0.0",
     "deepeval>=2.0.0",
+    "google-genai>=1.10.0",
     "faker>=37.0.0",
     "asyncpg>=0.30.0",
     "httpx>=0.28.0",

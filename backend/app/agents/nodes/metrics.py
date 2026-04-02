@@ -13,10 +13,12 @@ from app.agents.tools.metric_tools import (
     compute_slippage,
     compute_stale_deals,
 )
+from app.core.model import get_model, AGENT_SETTINGS
 
 
 metrics_agent = Agent(
-    model="openai:gpt-4o",
+    model=get_model(),
+    model_settings=AGENT_SETTINGS,
     deps_type=dict,
     output_type=list[MetricResult],
     instructions="""

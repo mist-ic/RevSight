@@ -7,10 +7,11 @@ load_dotenv()
 DATABASE_URL = os.getenv("DATABASE_URL", "")
 
 # LLM
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
-LITELLM_PRIMARY_MODEL = os.getenv("LITELLM_PRIMARY_MODEL", "gpt-4o")
-LITELLM_FALLBACK_MODEL = os.getenv("LITELLM_FALLBACK_MODEL", "claude-sonnet-4-5")
+PRIMARY_MODEL = os.getenv("PRIMARY_MODEL", "google-gla:gemini-3-flash-preview")
+LITELLM_FALLBACK_MODEL = os.getenv("LITELLM_FALLBACK_MODEL", "google-gla:gemini-2.5-flash")
 
 # Observability
 LANGCHAIN_TRACING_V2 = os.getenv("LANGCHAIN_TRACING_V2", "true")

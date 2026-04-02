@@ -6,6 +6,7 @@ from pydantic_ai import Agent, RunContext
 
 from app.agents.schemas.metrics import MetricResult, RiskObject, RiskSeverity
 from app.agents.schemas.request import ReportRequest
+from app.core.model import get_model, AGENT_SETTINGS
 
 
 RISK_THRESHOLDS = {
@@ -82,7 +83,8 @@ def _build_heuristic_risks(metrics: list[MetricResult]) -> list[RiskObject]:
 
 
 risk_agent = Agent(
-    model="openai:gpt-4o",
+    model=get_model(),
+    model_settings=AGENT_SETTINGS,
     deps_type=dict,
     output_type=list[RiskObject],
     instructions="""

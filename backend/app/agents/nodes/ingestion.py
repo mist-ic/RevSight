@@ -6,6 +6,7 @@ from pydantic_ai import Agent, RunContext
 
 from app.agents.schemas.request import ReportRequest
 from app.agents.tools.sql_tools import run_raw_query
+from app.core.model import get_model, AGENT_SETTINGS
 
 
 class IngestionResult(BaseModel):
@@ -17,7 +18,8 @@ class IngestionResult(BaseModel):
 
 
 ingestion_agent = Agent(
-    model="openai:gpt-4o",
+    model=get_model(),
+    model_settings=AGENT_SETTINGS,
     deps_type=dict,
     output_type=IngestionResult,
     instructions="""

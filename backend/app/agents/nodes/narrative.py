@@ -6,6 +6,7 @@ from pydantic_ai import Agent, RunContext
 from app.agents.schemas.metrics import MetricResult, RiskObject
 from app.agents.schemas.report import PipelineHealthReport
 from app.agents.schemas.request import ReportRequest
+from app.core.model import get_model, AGENT_SETTINGS
 
 
 NARRATIVE_SYSTEM = """
@@ -14,20 +15,25 @@ Your job is to produce a structured pipeline health report for a CRM/RevOps cont
 
 CRITICAL RULES:
 1. Every number you include in the executive_summary, risk narratives, or opportunity narratives
-   MUST come directly from the metrics list passed to you. Do NOT invent percentages, ARR figures,
-   deal counts, or ratios not present in the data.
-2. Write in clear, executive-level language appropriate for a CRO or RevOps lead.
-3. Be specific. Cite metric names and values when making claims.
-4. Forecast confidence: base this ONLY on data quality issues and metric health.
-   High data quality + healthy metrics = 0.75-0.90. Issues present = 0.40-0.65.
-5. Overall status: 'healthy' if all key metrics are above benchmarks,
-   'at_risk' if 1-2 are below, 'critical' if coverage < 2x or win_rate < 15%.
-6. No em dashes. Use plain hyphen if needed.
+   MUST come directly from the metrics list returned by your get_all_metrics tool.
+   Do NOT invent percentages, ARR figures, deal counts, or ratios not present in the data.
+2. You MUST call get_all_metrics and get_all_risks tools BEFORE writing the report.
+3. Write in clear, executive-level language appropriate for a CRO or RevOps lead.
+4. Be specific. Cite metric names and values when making claims.
+5. Forecast confidence: base it ONLY on data quality issues and metric health.
+   All healthy metrics + no data issues = 0.75 to 0.90.
+   Data issues present = 0.40 to 0.65.
+6. Overall status: 'healthy' if all key metrics are above benchmarks,
+   'at_risk' if 1 to 2 are below, 'critical' if coverage < 2x or win_rate < 15%.
+7. No em dashes. Use plain hyphen if needed.
+8. Return ALL required fields: executive_summary, key_metrics, risks, opportunities,
+   recommended_actions, forecast_confidence, data_quality_flags, overall_status.
 """
 
 
 narrative_agent = Agent(
-    model="openai:gpt-4o",
+    model=get_model(),
+    model_settings=AGENT_SETTINGS,
     deps_type=dict,
     output_type=PipelineHealthReport,
     instructions=NARRATIVE_SYSTEM,
