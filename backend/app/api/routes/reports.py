@@ -1,11 +1,28 @@
-from fastapi import APIRouter
-from app.db.connection import execute_one
+from datetime import datetime, date
+import decimal
+import json as _json
+from uuid import UUID
+from fastapi import APIRouter, Query
+from app.db.connection import execute_query, execute_one
 from app.agents.graph import run_pipeline
 from app.agents.schemas.request import ReportRequest
 from pydantic import BaseModel
-import uuid
 
 router = APIRouter()
+
+
+def _coerce_row(row: dict) -> dict:
+    result = {}
+    for k, v in row.items():
+        if isinstance(v, UUID):
+            result[k] = str(v)
+        elif isinstance(v, (datetime, date)):
+            result[k] = v.isoformat()
+        elif isinstance(v, decimal.Decimal):
+            result[k] = float(v)
+        else:
+            result[k] = v
+    return result
 
 
 class ReportResponse(BaseModel):
@@ -46,13 +63,22 @@ async def create_report(request: ReportRequest):
 @router.get("/{run_id}", response_model=ReportResponse)
 async def get_report(run_id: str):
     """Fetch a completed report by run_id."""
-    row = await execute_one("SELECT * FROM runs WHERE id = $1", run_id)
+    row = await execute_one("SELECT * FROM runs WHERE id = $1::uuid", run_id)
     if not row:
         from fastapi import HTTPException
         raise HTTPException(status_code=404, detail="Run not found")
 
-    # report_json is JSONB from postgres -- already a dict when fetched via asyncpg
-    report_data = row.get("report_json")
+    row = _coerce_row(dict(row))
+
+    # asyncpg JSONB comes back as string with SELECT * -- parse it
+    raw = row.get("report_json")
+    if isinstance(raw, str):
+        try:
+            report_data = _json.loads(raw)
+        except Exception:
+            report_data = None
+    else:
+        report_data = raw
 
     return ReportResponse(
         run_id=row["id"],

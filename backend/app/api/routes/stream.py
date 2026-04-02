@@ -7,12 +7,11 @@ import asyncio
 from typing import AsyncGenerator
 
 from fastapi import APIRouter
-from fastapi.responses import StreamingResponse
 from sse_starlette.sse import EventSourceResponse
 
 from app.agents.schemas.request import ReportRequest
-from app.agents.graph import compiled_graph, run_pipeline
-from app.core.audit import create_run
+from app.agents.graph import compiled_graph
+from app.core.audit import create_run, complete_run, fail_run
 
 router = APIRouter()
 
@@ -27,7 +26,7 @@ SCENARIO_MAP = {
 async def stream_report(request: ReportRequest):
     """
     SSE endpoint streaming agent execution steps.
-    Events: step, tool_start, tool_end, token, done, error
+    Yields plain dicts -- EventSourceResponse wraps them in data: prefix.
     """
     if not request.scenario_id:
         key = f"{request.region.lower()}_{request.segment.lower()}"
@@ -37,8 +36,8 @@ async def stream_report(request: ReportRequest):
 
     run_id = str(uuid.uuid4())
 
-    async def event_generator() -> AsyncGenerator[str, None]:
-        yield f"data: {json.dumps({'type': 'run_started', 'run_id': run_id})}\n\n"
+    async def event_generator() -> AsyncGenerator[dict, None]:
+        yield {"data": json.dumps({"type": "run_started", "run_id": run_id})}
 
         try:
             await create_run(run_id, request.model_dump())
@@ -57,6 +56,8 @@ async def stream_report(request: ReportRequest):
                 "approval_status": "pending",
             }
 
+            final_state = None
+
             async for event in compiled_graph.astream_events(
                 initial_state,
                 config={"configurable": {"thread_id": run_id}},
@@ -65,28 +66,47 @@ async def stream_report(request: ReportRequest):
                 kind = event["event"]
 
                 if kind == "on_chain_start" and event.get("name") not in ("LangGraph", ""):
-                    yield f"data: {json.dumps({'type': 'step', 'node': event['name']})}\n\n"
+                    yield {"data": json.dumps({"type": "step", "node": event["name"]})}
 
                 elif kind == "on_tool_start":
-                    yield f"data: {json.dumps({'type': 'tool_start', 'name': event['name'], 'input': str(event['data'].get('input', ''))[:200]})}\n\n"
+                    yield {"data": json.dumps({
+                        "type": "tool_start",
+                        "name": event["name"],
+                        "input": str(event["data"].get("input", ""))[:200],
+                    })}
 
                 elif kind == "on_tool_end":
-                    yield f"data: {json.dumps({'type': 'tool_end', 'name': event['name'], 'output': str(event['data'].get('output', ''))[:500]})}\n\n"
+                    yield {"data": json.dumps({
+                        "type": "tool_end",
+                        "name": event["name"],
+                        "output": str(event["data"].get("output", ""))[:500],
+                    })}
 
                 elif kind == "on_chat_model_stream":
                     chunk = event["data"]["chunk"].content
                     if chunk:
-                        yield f"data: {json.dumps({'type': 'token', 'content': chunk})}\n\n"
+                        yield {"data": json.dumps({"type": "token", "content": chunk})}
 
-                await asyncio.sleep(0)  # yield to event loop
+                elif kind == "on_chain_end" and event.get("name") == "LangGraph":
+                    # Final state comes out here
+                    final_state = event["data"].get("output")
 
-            # Fetch the final report from DB and emit it
-            from app.db.connection import execute_one
-            row = await execute_one("SELECT report_json FROM runs WHERE id = $1", run_id)
-            report = row.get("report_json") if row else None
-            yield f"data: {json.dumps({'type': 'done', 'run_id': run_id, 'report': report})}\n\n"
+                await asyncio.sleep(0)
+
+            # Persist and emit done event
+            report = None
+            if final_state and final_state.get("report"):
+                report = final_state["report"].model_dump()
+                await complete_run(run_id, report)
+            else:
+                await fail_run(run_id, "No report generated")
+
+            yield {"data": json.dumps({"type": "done", "run_id": run_id, "report": report})}
 
         except Exception as e:
-            yield f"data: {json.dumps({'type': 'error', 'message': str(e)})}\n\n"
+            import traceback
+            traceback.print_exc()
+            await fail_run(run_id, str(e))
+            yield {"data": json.dumps({"type": "error", "message": str(e)})}
 
     return EventSourceResponse(event_generator())

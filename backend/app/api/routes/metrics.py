@@ -20,12 +20,19 @@ async def get_pipeline_metrics(
     region: str = "NA",
     segment: str = "Enterprise",
 ):
-    """Return raw pipeline metrics aggregated by stage for chart rendering."""
+    """Return pipeline metrics aggregated by stage for chart rendering."""
     rows = await execute_query(
         """
-        SELECT stage_name, deal_count, total_arr, avg_probability, avg_age_days, missing_close_dates
+        SELECT
+            stage_name,
+            SUM(deal_count)          AS deal_count,
+            SUM(total_arr)           AS total_arr,
+            AVG(avg_probability)     AS avg_probability,
+            AVG(avg_age_days)        AS avg_age_days,
+            SUM(missing_close_dates) AS missing_close_dates
         FROM mv_pipeline_metrics
         WHERE scenario_id = $1 AND quarter = $2 AND region = $3 AND segment = $4
+        GROUP BY stage_name
         ORDER BY
             CASE stage_name
                 WHEN 'Discovery'   THEN 1

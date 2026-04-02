@@ -1,5 +1,6 @@
 from datetime import datetime, date
 import decimal
+from uuid import UUID
 from fastapi import APIRouter, Query
 from app.db.connection import execute_query
 
@@ -9,7 +10,9 @@ router = APIRouter()
 def _coerce_row(row: dict) -> dict:
     result = {}
     for k, v in row.items():
-        if isinstance(v, (datetime, date)):
+        if isinstance(v, UUID):
+            result[k] = str(v)
+        elif isinstance(v, (datetime, date)):
             result[k] = v.isoformat()
         elif isinstance(v, decimal.Decimal):
             result[k] = float(v)
