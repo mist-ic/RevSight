@@ -70,7 +70,9 @@ export function streamReport(
         signal: controller.signal,
       });
 
+      if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
       if (!res.body) throw new Error("No response body");
+
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
       let buffer = "";
@@ -80,15 +82,24 @@ export function streamReport(
         if (done) break;
         buffer += decoder.decode(value, { stream: true });
 
-        const parts = buffer.split("\n\n");
+        // Server sends \r\n\r\n between events -- normalize to \n\n first
+        const normalized = buffer.replace(/\r\n/g, "\n");
+        const parts = normalized.split("\n\n");
+        // Keep last partial part in buffer
         buffer = parts.pop() ?? "";
+
         for (const part of parts) {
-          if (!part.startsWith("data: ")) continue;
-          try {
-            const event = JSON.parse(part.slice(6));
-            onEvent(event);
-          } catch {
-            // skip malformed chunks
+          for (const line of part.split("\n")) {
+            const trimmed = line.trim();
+            if (!trimmed.startsWith("data: ")) continue;
+            const payload = trimmed.slice(6).trim();
+            if (!payload) continue;
+            try {
+              const event = JSON.parse(payload);
+              onEvent(event);
+            } catch {
+              // skip malformed chunks
+            }
           }
         }
       }
