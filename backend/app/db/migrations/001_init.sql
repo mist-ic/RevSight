@@ -44,9 +44,7 @@ CREATE TABLE IF NOT EXISTS opportunities (
     contact_id        UUID REFERENCES contacts(id),
     owner_id          UUID REFERENCES users(id),
     name              TEXT NOT NULL,
-    stage_name        TEXT CHECK (stage_name IN (
-                          'Discovery', 'Demo', 'Proposal', 'Negotiation', 'Closed Won', 'Closed Lost'
-                      )),
+    stage_name        TEXT,   -- no CHECK -- APAC scenario uses intentionally bad values
     arr               NUMERIC(12, 2),
     probability       SMALLINT CHECK (probability BETWEEN 0 AND 100),
     forecast_category TEXT CHECK (forecast_category IN ('Pipeline', 'Best Case', 'Commit', 'Closed')),

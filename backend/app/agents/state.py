@@ -26,4 +26,5 @@ class RevSightState(TypedDict):
     report: Optional[PipelineHealthReport]
     messages: Annotated[list, add_messages]
     guardrail_passed: bool
+    narrative_retry_count: int
     approval_status: str  # "pending" | "approved" | "rejected"

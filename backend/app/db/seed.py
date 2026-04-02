@@ -119,8 +119,14 @@ def close_date_for(stage: str, missing_pct: float, past_pct: float) -> date | No
     return base + timedelta(days=random.randint(20, 120))
 
 
+def _unique_email() -> str:
+    """Always-unique email using UUID suffix to avoid Faker pool exhaustion."""
+    return f"user_{uuid.uuid4().hex[:10]}@{fake.domain_name()}"
+
+
 async def seed_scenario(conn: asyncpg.Connection, scenario: dict[str, Any]) -> None:
     print(f"  Seeding: {scenario['label']}")
+    fake.unique.clear()  # Reset unique pool for each scenario
 
     user_ids: list[str] = []
     for _ in range(10):
@@ -132,7 +138,7 @@ async def seed_scenario(conn: asyncpg.Connection, scenario: dict[str, Any]) -> N
             VALUES ($1, $2, $3, $4, $5)
             ON CONFLICT DO NOTHING
             """,
-            uid, fake.name(), fake.unique.email(),
+            uid, fake.name(), _unique_email(),
             random.choice(["ae", "sdr", "manager"]),
             scenario["region"],
         )
@@ -167,7 +173,7 @@ async def seed_scenario(conn: asyncpg.Connection, scenario: dict[str, Any]) -> N
                 VALUES ($1, $2, $3, $4, $5, $6, $7)
                 ON CONFLICT DO NOTHING
                 """,
-                cid, aid, fake.unique.email(), fake.name(),
+                cid, aid, _unique_email(), fake.name(),
                 random.choice(TITLES),
                 random.choice(["sql", "sal", "opportunity"]),
                 random.choice(["inbound", "outbound", "referral", "event"]),

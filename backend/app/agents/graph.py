@@ -73,9 +73,11 @@ async def narrative_node(state: RevSightState) -> dict:
     await log_agent_step(state["run_id"], "narrative", duration)
 
     passed, issues = check_numeric_consistency(report, state["metrics"])
+    retry_count = state.get("narrative_retry_count", 0)
     return {
         "report": report,
         "guardrail_passed": passed,
+        "narrative_retry_count": retry_count + (0 if passed else 1),
         "messages": [{"role": "system", "content": f"Narrative done. Guardrail: {'pass' if passed else 'fail'}"}],
     }
 
@@ -97,10 +99,9 @@ async def governance_node(state: RevSightState) -> dict:
 def guardrail_router(state: RevSightState) -> str:
     """Route back to narrative if guardrail failed, otherwise to governance."""
     if not state.get("guardrail_passed", True):
-        retry_count = sum(1 for m in state.get("messages", [])
-                          if "Narrative done" in str(m.get("content", "")))
-        if retry_count <= MAX_NARRATIVE_RETRIES:
-            logger.warning(f"[{state['run_id']}] Guardrail failed, retrying narrative (attempt {retry_count})")
+        retry_count = state.get("narrative_retry_count", 0)
+        if retry_count < MAX_NARRATIVE_RETRIES:
+            logger.warning(f"[{state['run_id']}] Guardrail failed, retrying (attempt {retry_count + 1})")
             return "narrative"
     return "governance"
 
@@ -150,6 +151,7 @@ async def run_pipeline(request: ReportRequest) -> RevSightState:
         "report": None,
         "messages": [],
         "guardrail_passed": True,
+        "narrative_retry_count": 0,
         "approval_status": "pending",
     }
 

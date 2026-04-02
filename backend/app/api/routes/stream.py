@@ -53,6 +53,7 @@ async def stream_report(request: ReportRequest):
                 "report": None,
                 "messages": [],
                 "guardrail_passed": True,
+                "narrative_retry_count": 0,
                 "approval_status": "pending",
             }
 
