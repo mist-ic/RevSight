@@ -9,15 +9,33 @@ from app.agents.schemas.report import PipelineHealthReport
 
 logger = logging.getLogger(__name__)
 
-# Acceptable constants that can appear in narrative without being in metrics
-ALLOWED_CONSTANTS = {"0", "1", "2", "3", "100", "0.0", "1.0", "45", "3x", "2x"}
+# Constants that can appear in narrative without being in metrics
+ALLOWED_CONSTANTS = {
+    "0", "1", "2", "3", "4", "5", "10", "100", "0.0", "1.0",
+    "45", "90", "180", "365",  # common thresholds
+    "2026", "2025", "2024",    # years
+    "3x", "2x", "1x",
+}
 
 
 def extract_numbers(text: str) -> set[str]:
     """Extract all numeric values (including percentages and decimals) from text."""
-    # Match numbers like 4.2, 28%, 1800, $4.2M, 3x
     raw = re.findall(r"\$?(\d+(?:\.\d+)?)[xX%]?", text)
     return {n for n in raw if n not in ALLOWED_CONSTANTS}
+
+
+def _metric_value_set(metrics: list[MetricResult]) -> set[str]:
+    """Build a set of allowed numeric strings from the metrics list."""
+    values: set[str] = set()
+    for m in metrics:
+        v = m.value
+        values.add(str(round(v, 0)).rstrip("0").rstrip("."))  # e.g. "169"
+        values.add(str(int(v)))                                # e.g. "169"
+        values.add(str(round(v, 1)))                           # e.g. "169.2"
+        values.add(str(round(v, 2)))                           # e.g. "169.18"
+        # Also the raw float string in case exact match
+        values.add(str(v))
+    return values
 
 
 def check_numeric_consistency(
@@ -28,8 +46,7 @@ def check_numeric_consistency(
     Verify that every number in the narrative exists in the metrics.
     Returns (passed, list_of_issues).
     """
-    metric_values = {str(round(m.value, 1)) for m in metrics}
-    metric_values |= {str(int(m.value)) for m in metrics}
+    metric_values = _metric_value_set(metrics)
 
     issues: list[str] = []
 

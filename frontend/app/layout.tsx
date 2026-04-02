@@ -19,12 +19,16 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body>
-        <div className="flex min-h-screen">
-          <Nav />
-          <main className="flex-1 ml-64 min-h-screen">
-            {children}
-          </main>
-        </div>
+        <Nav />
+        <main
+          style={{
+            marginLeft: "256px",
+            minHeight: "100vh",
+            position: "relative",
+          }}
+        >
+          {children}
+        </main>
         <Toaster position="bottom-right" theme="dark" />
       </body>
     </html>

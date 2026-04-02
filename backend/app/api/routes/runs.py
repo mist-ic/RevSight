@@ -1,7 +1,21 @@
+from datetime import datetime, date
+import decimal
 from fastapi import APIRouter, Query
 from app.db.connection import execute_query
 
 router = APIRouter()
+
+
+def _coerce_row(row: dict) -> dict:
+    result = {}
+    for k, v in row.items():
+        if isinstance(v, (datetime, date)):
+            result[k] = v.isoformat()
+        elif isinstance(v, decimal.Decimal):
+            result[k] = float(v)
+        else:
+            result[k] = v
+    return result
 
 
 @router.get("")
@@ -20,4 +34,4 @@ async def list_runs(
         """,
         limit, offset,
     )
-    return {"runs": rows, "limit": limit, "offset": offset}
+    return {"runs": [_coerce_row(r) for r in rows], "limit": limit, "offset": offset}

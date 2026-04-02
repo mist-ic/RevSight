@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Zap, TrendingUp, AlertTriangle, Database, ChevronRight, Users } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { LivePipelineChart } from "@/components/dashboard/live-pipeline-chart";
 import type { Persona, Scenario } from "@/lib/types";
 
 const SCENARIOS: Scenario[] = [
@@ -216,6 +217,11 @@ export default function HomePage() {
                     {tag}
                   </span>
                 ))}
+              </div>
+
+              {/* Live chart */}
+              <div className="mb-4">
+                <LivePipelineChart scenarioId={scenario.id} />
               </div>
 
               {/* CTA */}

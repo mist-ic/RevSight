@@ -1,6 +1,11 @@
 // API client for RevSight backend
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+// In the browser, use relative /api/* paths which Next.js proxies to the backend.
+// For SSR or non-browser contexts, fall back to the env var.
+const API_URL =
+  typeof window !== "undefined"
+    ? ""
+    : (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000");
 
 export async function createReport(body: {
   quarter: string;
