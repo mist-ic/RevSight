@@ -1,4 +1,4 @@
-# RevSight — Revenue Command Copilot
+# RevSight - Revenue Command Copilot
 
 <div align="center">
 
@@ -18,11 +18,11 @@ Pick a scenario → watch a multi-agent AI pipeline execute in real time → get
 
 RevSight runs a 5-node LangGraph pipeline on every request:
 
-1. **Ingest** — Loads a pipeline snapshot from PostgreSQL (opportunities, stages, activities, targets)
-2. **Compute Metrics** — Pydantic AI agent runs 5 parameterized SQL templates (coverage, conversion, velocity, slippage, deal aging). The LLM never computes numbers.
-3. **Assess Risks** — Threshold heuristics classify risks (coverage < 3x, stage aging > 45 days, account concentration) — LLM adds narrative context only
-4. **Generate Narrative** — Pydantic AI agent writes a structured `PipelineHealthReport`. Numeric guardrail rejects the output and retries if any number doesn't match the metrics JSON
-5. **Governance** — Logs the proposed report to the audit trail; auto-approves in demo mode, pauses for HITL in production (`REQUIRE_APPROVAL=true`)
+1. **Ingest** - Loads a pipeline snapshot from PostgreSQL (opportunities, stages, activities, targets)
+2. **Compute Metrics** - Pydantic AI agent runs 5 parameterized SQL templates (coverage, conversion, velocity, slippage, deal aging). The LLM never computes numbers.
+3. **Assess Risks** - Threshold heuristics classify risks (coverage < 3x, stage aging > 45 days, account concentration) - LLM adds narrative context only
+4. **Generate Narrative** - Pydantic AI agent writes a structured `PipelineHealthReport`. Numeric guardrail rejects the output and retries if any number doesn't match the metrics JSON
+5. **Governance** - Logs the proposed report to the audit trail; auto-approves in demo mode, pauses for HITL in production (`REQUIRE_APPROVAL=true`)
 
 Every step streams to the frontend via SSE as it happens.
 
@@ -41,9 +41,9 @@ Every step streams to the frontend via SSE as it happens.
 
 | Scenario | What to expect |
 |---|---|
-| **NA Enterprise Q3** | Healthy pipeline — 4.2x coverage, 28% win rate, clean data |
-| **EMEA SMB Q3** | At-risk — 1.8x coverage, top-heavy stage distribution, SDR recommendations |
-| **APAC Enterprise Q3** | Critical — 30% missing close dates, data quality flagged as primary risk |
+| **NA Enterprise Q3** | Healthy pipeline - 4.2x coverage, 28% win rate, clean data |
+| **EMEA SMB Q3** | At-risk - 1.8x coverage, top-heavy stage distribution, SDR recommendations |
+| **APAC Enterprise Q3** | Critical - 30% missing close dates, data quality flagged as primary risk |
 
 ---
 
@@ -184,9 +184,9 @@ If the check fails, the narrative node is re-invoked with the validation error i
 
 Deployed on Google Cloud Run (`asia-south1`) with GitHub Actions CI/CD:
 
-- **Scale-to-zero** — 0 instances at idle, auto-scales on request
-- **Secrets** — `GEMINI_API_KEY` and `DATABASE_URL` stored in GCP Secret Manager, mounted at runtime
-- **Path-based CI** — push to `backend/**` only rebuilds and redeploys the backend; push to `frontend/**` only rebuilds the frontend
+- **Scale-to-zero** - 0 instances at idle, auto-scales on request
+- **Secrets** - `GEMINI_API_KEY` and `DATABASE_URL` stored in GCP Secret Manager, mounted at runtime
+- **Path-based CI** - push to `backend/**` only rebuilds and redeploys the backend; push to `frontend/**` only rebuilds the frontend
 - **Force deploy** via CLI: `gh workflow run deploy.yml -f deploy_backend=true`
 
 ---
@@ -221,9 +221,9 @@ RevSight/
 
 ## Phase 4 Roadmap (not yet implemented)
 
-- [ ] **MCP Server** — expose PostgreSQL as a Model Context Protocol server, replace direct SQL tools with MCP client calls
-- [ ] **A2A Agent Card** — publish `/.well-known/agent.json` for agent interoperability
-- [ ] **NeMo Guardrails** — input topic filtering + PII scrubbing via Colang rails
-- [ ] **dbt Semantic Layer** — replace materialized views with governed dbt models
-- [ ] **HITL Approval UI** — wire `interrupt()` to WebSocket for live approve/reject in the browser
-- [ ] **PDF Export** — react-pdf QBR report download
+- [ ] **MCP Server** - expose PostgreSQL as a Model Context Protocol server, replace direct SQL tools with MCP client calls
+- [ ] **A2A Agent Card** - publish `/.well-known/agent.json` for agent interoperability
+- [ ] **NeMo Guardrails** - input topic filtering + PII scrubbing via Colang rails
+- [ ] **dbt Semantic Layer** - replace materialized views with governed dbt models
+- [ ] **HITL Approval UI** - wire `interrupt()` to WebSocket for live approve/reject in the browser
+- [ ] **PDF Export** - react-pdf QBR report download

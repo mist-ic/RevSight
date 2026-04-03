@@ -20,13 +20,12 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body>
         <Nav />
+        {/* Offset: 256px on desktop, 56px top bar on mobile */}
         <main
-          style={{
-            marginLeft: "256px",
-            minHeight: "100vh",
-            position: "relative",
-          }}
+          className="md:ml-64"
+          style={{ paddingTop: "0", minHeight: "100vh", position: "relative" }}
         >
+          <div className="block md:hidden h-14" /> {/* mobile top-bar spacer */}
           {children}
         </main>
         <Toaster position="bottom-right" theme="dark" />

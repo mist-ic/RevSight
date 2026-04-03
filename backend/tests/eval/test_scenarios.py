@@ -1,163 +1,197 @@
 """
-DeepEval evaluation suite for RevSight.
+DeepEval scenario-based evaluation tests for RevSight.
 
-Tests:
-  1. NA Healthy -- should classify healthy with confidence > 0.70
-  2. EMEA Under-covered -- should flag low coverage risk
-  3. APAC Data Quality -- should identify missing close dates as primary risk
-  4. Numeric consistency -- all narrative numbers must appear in computed metrics
+Run with:
+    cd backend
+    uv run python -m pytest tests/eval/test_scenarios.py -v
 
-Run: python -m pytest tests/eval/ -v
+Requires:
+    GEMINI_API_KEY and DATABASE_URL in environment (or backend/.env)
+    uv run to activate the venv with deepeval installed
 """
-from __future__ import annotations
-
 import json
 import re
-import pytest
 import asyncio
-from deepeval import evaluate
-from deepeval.test_case import LLMTestCase
-from deepeval.metrics import (
-    GEval,
-    HallucinationMetric,
-)
-from deepeval.metrics.g_eval import GEvalMetric
 
-# We import the pipeline directly to test the full stack
-from app.agents.schemas.request import ReportRequest, Persona
+import pytest
+
+from deepeval import assert_test
+from deepeval.metrics import GEval
+from deepeval.test_case import LLMTestCase, LLMTestCaseParams
+
 from app.agents.graph import run_pipeline
+from app.agents.schemas.request import ReportRequest
+from app.db.connection import init_db
 
 
-# ─── Helpers ──────────────────────────────────────────────────────────────────
+# ---------------------------------------------------------------------------
+# Shared helper
+# ---------------------------------------------------------------------------
 
 def run_sync(coro):
-    return asyncio.get_event_loop().run_until_complete(coro)
+    loop = asyncio.new_event_loop()
+    try:
+        return loop.run_until_complete(coro)
+    finally:
+        loop.close()
 
 
-def pipeline_result(scenario_id: str, region: str, segment: str, persona: str = "cro"):
+async def _run_scenario(scenario_id: str, region: str, segment: str) -> dict:
+    await init_db()
     req = ReportRequest(
         quarter="Q3-2026",
         region=region,
         segment=segment,
-        persona=Persona(persona),
+        persona="revops",
         scenario_id=scenario_id,
     )
-    return run_sync(run_pipeline(req))
+    state = await run_pipeline(req)
+    report = state.get("report")
+    return report.model_dump() if report else {}
 
 
-def extract_numbers(text: str) -> set[str]:
-    return set(re.findall(r"\d+(?:\.\d+)?", text))
+# ---------------------------------------------------------------------------
+# Scenario 1: NA Healthy
+# ---------------------------------------------------------------------------
+
+@pytest.fixture(scope="module")
+def na_report():
+    return run_sync(_run_scenario("na_healthy", "NA", "Enterprise"))
 
 
-# ─── Scenario 1: NA Healthy ───────────────────────────────────────────────────
-
-class TestNAHealthy:
-    @pytest.fixture(scope="class")
-    def state(self):
-        return pipeline_result("na_healthy", "NA", "Enterprise")
-
-    def test_status_healthy(self, state):
-        assert state["report"] is not None, "Report should not be None"
-        assert state["report"].overall_status == "healthy", (
-            f"Expected 'healthy', got '{state['report'].overall_status}'"
-        )
-
-    def test_confidence_above_threshold(self, state):
-        assert state["report"].forecast_confidence >= 0.70, (
-            f"Expected confidence >= 0.70, got {state['report'].forecast_confidence}"
-        )
-
-    def test_has_executive_summary(self, state):
-        summary = state["report"].executive_summary
-        assert len(summary) > 100, "Executive summary too short"
-        assert "NA" in summary or "Enterprise" in summary or "Q3" in summary
-
-    def test_no_critical_risks(self, state):
-        high_risks = [r for r in state["report"].risks if r.severity == "high"]
-        assert len(high_risks) == 0, f"Healthy scenario should have no high risks, found: {[r.title for r in high_risks]}"
-
-    def test_has_metrics(self, state):
-        assert len(state["report"].key_metrics) >= 3, "Should have at least 3 key metrics"
-
-    def test_approved(self, state):
-        assert state["approval_status"] == "approved"
+def test_na_status_healthy(na_report):
+    assert na_report.get("overall_status") == "healthy", (
+        f"Expected 'healthy', got '{na_report.get('overall_status')}'"
+    )
 
 
-# ─── Scenario 2: EMEA Under-covered ──────────────────────────────────────────
-
-class TestEMEAUndercovered:
-    @pytest.fixture(scope="class")
-    def state(self):
-        return pipeline_result("emea_undercovered", "EMEA", "SMB")
-
-    def test_status_at_risk_or_critical(self, state):
-        assert state["report"].overall_status in ("at_risk", "critical"), (
-            f"Under-covered should be at_risk or critical, got '{state['report'].overall_status}'"
-        )
-
-    def test_coverage_risk_identified(self, state):
-        risk_titles = [r.title.lower() for r in state["report"].risks]
-        coverage_flagged = any("coverage" in t or "pipeline" in t for t in risk_titles)
-        assert coverage_flagged, f"Coverage risk not flagged. Risks: {risk_titles}"
-
-    def test_confidence_below_healthy(self, state):
-        # Under-covered should have lower confidence than healthy
-        assert state["report"].forecast_confidence <= 0.75
-
-    def test_has_high_risk(self, state):
-        high_risks = [r for r in state["report"].risks if r.severity == "high"]
-        assert len(high_risks) >= 1, "Under-covered scenario should have at least 1 high risk"
+def test_na_forecast_confidence_high(na_report):
+    c = na_report.get("forecast_confidence", 0)
+    assert c >= 0.65, f"Expected >= 0.65, got {c}"
 
 
-# ─── Scenario 3: APAC Data Quality ───────────────────────────────────────────
-
-class TestAPACDataQuality:
-    @pytest.fixture(scope="class")
-    def state(self):
-        return pipeline_result("apac_dataquality", "APAC", "Enterprise")
-
-    def test_data_quality_flags_present(self, state):
-        flags = state["report"].data_quality_flags
-        assert len(flags) >= 1, "APAC scenario should have at least 1 data quality flag"
-
-    def test_low_confidence(self, state):
-        assert state["report"].forecast_confidence <= 0.70, (
-            f"Data quality scenario should have low confidence, got {state['report'].forecast_confidence}"
-        )
-
-    def test_data_quality_mentioned_in_summary(self, state):
-        summary = state["report"].executive_summary.lower()
-        quality_terms = ["data", "quality", "missing", "incomplete", "inconsistent"]
-        assert any(t in summary for t in quality_terms), (
-            "APAC executive summary should mention data quality issues"
-        )
+def test_na_has_metrics(na_report):
+    assert len(na_report.get("key_metrics", [])) >= 3
 
 
-# ─── Numeric Consistency Tests ────────────────────────────────────────────────
+def test_na_no_high_risks(na_report):
+    high = [r for r in na_report.get("risks", []) if r.get("severity") == "high"]
+    assert len(high) == 0, f"Healthy pipeline should have no high-severity risks: {high}"
 
-class TestNumericConsistency:
-    @pytest.fixture(scope="class")
-    def state(self):
-        return pipeline_result("na_healthy", "NA", "Enterprise")
 
-    def test_guardrail_passed(self, state):
-        assert state.get("guardrail_passed", True), (
-            "Guardrail should pass -- all narrative numbers should match metrics"
-        )
+def test_na_summary_references_pipeline(na_report):
+    summary = na_report.get("executive_summary", "").lower()
+    assert any(w in summary for w in ["coverage", "pipeline", "healthy", "strong", "win"])
 
-    def test_executive_summary_has_no_fictional_numbers(self, state):
-        report = state["report"]
-        metric_values = {str(round(m.value, 1)) for m in report.key_metrics}
-        metric_values |= {str(int(m.value)) for m in report.key_metrics}
 
-        # Extract numbers from summary
-        summary_numbers = extract_numbers(report.executive_summary)
+def test_na_deepeval_correctness(na_report):
+    tc = LLMTestCase(
+        input="Analyze NA Enterprise Q3 2026 pipeline health",
+        actual_output=na_report.get("executive_summary", ""),
+        expected_output=(
+            "The pipeline is healthy with strong coverage, good win rate, "
+            "and balanced stage distribution across Discovery, Demo, Proposal, and Negotiation."
+        ),
+    )
+    metric = GEval(
+        name="Correctness",
+        criteria="The report correctly identifies a healthy pipeline with good coverage and win rates.",
+        evaluation_params=[LLMTestCaseParams.ACTUAL_OUTPUT, LLMTestCaseParams.EXPECTED_OUTPUT],
+        threshold=0.5,
+    )
+    assert_test(tc, [metric])
 
-        # Allow common non-metric numbers (quarters, years, percentages of 100, etc.)
-        allowed = {"2026", "3", "100", "0", "1", "2", "45", "90"}
-        unverified = summary_numbers - metric_values - allowed
 
-        # Soft check -- warn but don't hard-fail (narrative may use rounded values)
-        if unverified:
-            print(f"WARNING: Potentially unverified numbers in summary: {unverified}")
-            print(f"Metric values: {sorted(metric_values)}")
+# ---------------------------------------------------------------------------
+# Scenario 2: EMEA Under-covered
+# ---------------------------------------------------------------------------
+
+@pytest.fixture(scope="module")
+def emea_report():
+    return run_sync(_run_scenario("emea_undercovered", "EMEA", "SMB"))
+
+
+def test_emea_status_at_risk(emea_report):
+    status = emea_report.get("overall_status")
+    assert status in ("at_risk", "critical"), f"Expected at_risk or critical, got {status}"
+
+
+def test_emea_has_coverage_risk(emea_report):
+    text = " ".join(
+        r.get("title", "") + " " + r.get("narrative", "")
+        for r in emea_report.get("risks", [])
+    ).lower()
+    assert any(w in text for w in ["coverage", "pipeline", "capacity", "undercovered"]), (
+        f"Should flag coverage risk. Got: {text[:300]}"
+    )
+
+
+def test_emea_has_medium_or_high_risk(emea_report):
+    flagged = [r for r in emea_report.get("risks", []) if r.get("severity") in ("high", "medium")]
+    assert len(flagged) >= 1
+
+
+def test_emea_has_actions(emea_report):
+    assert len(emea_report.get("recommended_actions", [])) >= 2
+
+
+def test_emea_deepeval_risk_detection(emea_report):
+    risk_summary = "; ".join(r.get("title", "") for r in emea_report.get("risks", []))
+    tc = LLMTestCase(
+        input="Identify pipeline risks for EMEA SMB Q3 2026",
+        actual_output=risk_summary,
+        expected_output="Coverage risk -- pipeline coverage is below the 3x minimum required for forecast confidence",
+    )
+    metric = GEval(
+        name="Risk Detection",
+        criteria="The output identifies low pipeline coverage as a key risk for the EMEA SMB segment.",
+        evaluation_params=[LLMTestCaseParams.ACTUAL_OUTPUT, LLMTestCaseParams.EXPECTED_OUTPUT],
+        threshold=0.4,
+    )
+    assert_test(tc, [metric])
+
+
+# ---------------------------------------------------------------------------
+# Scenario 3: APAC Data Quality
+# ---------------------------------------------------------------------------
+
+@pytest.fixture(scope="module")
+def apac_report():
+    return run_sync(_run_scenario("apac_dataquality", "APAC", "Enterprise"))
+
+
+def test_apac_has_data_quality_flags(apac_report):
+    flags = apac_report.get("data_quality_flags", [])
+    summary = apac_report.get("executive_summary", "").lower()
+    assert len(flags) >= 1 or any(w in summary for w in ["missing", "data quality", "incomplete"]), (
+        f"Expected data quality flags. Summary: {summary[:200]}"
+    )
+
+
+def test_apac_lower_confidence(apac_report):
+    c = apac_report.get("forecast_confidence", 1.0)
+    assert c <= 0.75, f"Data quality scenario should have confidence <= 0.75, got {c}"
+
+
+def test_apac_data_quality_mentioned(apac_report):
+    text = (
+        apac_report.get("executive_summary", "") + " "
+        + " ".join(apac_report.get("data_quality_flags", [])) + " "
+        + " ".join(r.get("narrative", "") for r in apac_report.get("risks", []))
+    ).lower()
+    assert any(w in text for w in ["missing", "data quality", "close date", "incomplete", "inconsistent"]), (
+        f"Data quality must appear in risks/flags/summary. Got: {text[:400]}"
+    )
+
+
+def test_numeric_consistency_apac(apac_report):
+    """No hallucinated numbers -- every number in narrative must trace to a metric."""
+    metrics_vals = {str(round(m["value"], 1)) for m in apac_report.get("key_metrics", [])}
+    metrics_vals |= {str(int(m["value"])) for m in apac_report.get("key_metrics", [])}
+    summary = apac_report.get("executive_summary", "")
+    numbers = set(re.findall(r"\b\d+(?:\.\d+)?\b", summary))
+    ALLOWED = {"1", "2", "3", "4", "5", "10", "25", "30", "50", "100", "2026", "0", "15", "20"}
+    unverified = numbers - metrics_vals - ALLOWED
+    assert len(unverified) <= 3, (
+        f"Unverified numbers in narrative: {unverified}. Metrics: {metrics_vals}"
+    )

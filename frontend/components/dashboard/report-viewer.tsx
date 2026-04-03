@@ -5,6 +5,7 @@ import { TrendingUp, TrendingDown, AlertTriangle, CheckCircle2, Info } from "luc
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PipelineChart } from "./pipeline-chart";
+import { CoverageChart, ForecastGauge } from "./metric-charts";
 
 type Props = {
   report: PipelineHealthReport;
@@ -94,18 +95,10 @@ export function ReportViewer({ report, persona }: Props) {
             </span>
           </div>
           <p className="text-sm" style={{ color: "hsl(var(--foreground))", opacity: 0.8 }}>
-            Forecast confidence:{" "}
-            <strong>{Math.round(report.forecast_confidence * 100)}%</strong>
+            {report.risks.length} risks &middot; {report.recommended_actions.length} actions
           </p>
         </div>
-        <div className="text-right">
-          <p className="text-xs" style={{ color: "hsl(var(--muted-foreground))" }}>
-            {report.risks.length} risks identified
-          </p>
-          <p className="text-xs" style={{ color: "hsl(var(--muted-foreground))" }}>
-            {report.recommended_actions.length} recommended actions
-          </p>
-        </div>
+        <ForecastGauge confidence={report.forecast_confidence} />
       </div>
 
       {/* KPI cards */}
@@ -146,11 +139,17 @@ export function ReportViewer({ report, persona }: Props) {
                   Metrics
                 </TabsTrigger>
               )}
+              {(persona === "revops" || persona === "engineer") && (
+                <TabsTrigger value="charts" className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary text-sm">
+                  Charts
+                </TabsTrigger>
+              )}
             </TabsList>
           </div>
 
           {/* Summary */}
           <TabsContent value="summary" className="p-5 space-y-4">
+            <CoverageChart metrics={report.key_metrics} />
             <p className="text-sm leading-relaxed" style={{ color: "hsl(var(--foreground))", lineHeight: 1.7 }}>
               {report.executive_summary}
             </p>
@@ -325,6 +324,34 @@ export function ReportViewer({ report, persona }: Props) {
                     </div>
                   );
                 })}
+              </div>
+            </TabsContent>
+          )}
+
+          {/* Charts tab (RevOps + Engineer) */}
+          {(persona === "revops" || persona === "engineer") && (
+            <TabsContent value="charts" className="p-5 space-y-6">
+              <CoverageChart metrics={report.key_metrics} />
+              <div
+                className="rounded-xl p-4"
+                style={{ background: "hsl(var(--secondary))", border: "1px solid var(--glass-border)" }}
+              >
+                <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: "hsl(var(--muted-foreground))" }}>
+                  All Metrics
+                </p>
+                <div className="space-y-2">
+                  {report.key_metrics.map((m) => {
+                    const cfg = STATUS_COLORS[m.status] ?? STATUS_COLORS.unknown;
+                    return (
+                      <div key={m.metric_id} className="flex items-center justify-between text-sm">
+                        <span style={{ color: "hsl(var(--muted-foreground))" }}>{m.name}</span>
+                        <span className="font-semibold" style={{ color: cfg.color }}>
+                          {typeof m.value === "number" ? m.value.toFixed(1) : m.value}{m.unit}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             </TabsContent>
           )}
