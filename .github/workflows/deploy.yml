@@ -26,8 +26,8 @@ jobs:
     name: Detect changes
     runs-on: ubuntu-latest
     outputs:
-      backend: ${{ steps.filter.outputs.backend || github.event.inputs.deploy_backend }}
-      frontend: ${{ steps.filter.outputs.frontend || github.event.inputs.deploy_frontend }}
+      backend: ${{ steps.decide.outputs.backend }}
+      frontend: ${{ steps.decide.outputs.frontend }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -35,12 +35,24 @@ jobs:
 
       - uses: dorny/paths-filter@v3
         id: filter
+        if: github.event_name == 'push'
         with:
           filters: |
             backend:
               - 'backend/**'
             frontend:
               - 'frontend/**'
+
+      - name: Decide what to deploy
+        id: decide
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "backend=${{ github.event.inputs.deploy_backend }}" >> $GITHUB_OUTPUT
+            echo "frontend=${{ github.event.inputs.deploy_frontend }}" >> $GITHUB_OUTPUT
+          else
+            echo "backend=${{ steps.filter.outputs.backend }}" >> $GITHUB_OUTPUT
+            echo "frontend=${{ steps.filter.outputs.frontend }}" >> $GITHUB_OUTPUT
+          fi
 
   # ── Deploy backend (only when backend/ changes or forced) ──────────────────
   deploy-backend:
