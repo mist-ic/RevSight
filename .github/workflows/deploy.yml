@@ -26,10 +26,13 @@ jobs:
     name: Detect changes
     runs-on: ubuntu-latest
     outputs:
-      backend: ${{ steps.filter.outputs.backend }}
-      frontend: ${{ steps.filter.outputs.frontend }}
+      backend: ${{ steps.filter.outputs.backend || github.event.inputs.deploy_backend }}
+      frontend: ${{ steps.filter.outputs.frontend || github.event.inputs.deploy_frontend }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
       - uses: dorny/paths-filter@v3
         id: filter
         with:
@@ -39,11 +42,11 @@ jobs:
             frontend:
               - 'frontend/**'
 
-  # ── Deploy backend (only when backend/ changes) ────────────────────────────
+  # ── Deploy backend (only when backend/ changes or forced) ──────────────────
   deploy-backend:
     name: Deploy Backend
     needs: changes
-    if: needs.changes.outputs.backend == 'true' || github.event.inputs.deploy_backend == 'true'
+    if: needs.changes.outputs.backend == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -94,11 +97,11 @@ jobs:
           echo "Backend: $(gcloud run services describe ${{ env.BACKEND_SERVICE }} \
             --region=${{ env.REGION }} --format='value(status.url)')"
 
-  # ── Deploy frontend (only when frontend/ changes) ──────────────────────────
+  # ── Deploy frontend (only when frontend/ changes or forced) ────────────────
   deploy-frontend:
     name: Deploy Frontend
     needs: changes
-    if: needs.changes.outputs.frontend == 'true' || github.event.inputs.deploy_frontend == 'true'
+    if: needs.changes.outputs.frontend == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -116,7 +119,6 @@ jobs:
       - name: Configure Docker
         run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
 
-      # Always fetch backend URL from existing service (no dependency on backend job)
       - name: Get backend URL
         id: backend_url
         run: |
