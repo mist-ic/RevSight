@@ -15,13 +15,14 @@ steps:
     args:
       - build
       - -t
-      - ${_REPO}/backend:$SHORT_SHA
+      - ${_REPO}/backend:${SHORT_SHA}
       - -t
       - ${_REPO}/backend:latest
       - -f
       - backend/Dockerfile
       - backend/
-    waitFor: ["-"]
+    waitFor:
+      - "-"
 
   # ── 2. Push backend image ───────────────────────────────────────────────────
   - name: gcr.io/cloud-builders/docker
@@ -30,7 +31,8 @@ steps:
       - push
       - --all-tags
       - ${_REPO}/backend
-    waitFor: [build-backend]
+    waitFor:
+      - build-backend
 
   # ── 3. Deploy backend to Cloud Run ─────────────────────────────────────────
   - name: gcr.io/google.com/cloudsdktool/cloud-sdk
@@ -40,7 +42,7 @@ steps:
       - run
       - deploy
       - ${_BACKEND_SERVICE}
-      - --image=${_REPO}/backend:$SHORT_SHA
+      - --image=${_REPO}/backend:${SHORT_SHA}
       - --region=${_REGION}
       - --platform=managed
       - --allow-unauthenticated
@@ -53,36 +55,39 @@ steps:
       - --set-secrets=GEMINI_API_KEY=gemini-api-key:latest,DATABASE_URL=database-url:latest
       - --set-env-vars=LANGCHAIN_TRACING_V2=false,ENVIRONMENT=production,REQUIRE_APPROVAL=false
       - --quiet
-    waitFor: [push-backend]
+    waitFor:
+      - push-backend
 
-  # ── 4. Get backend URL ──────────────────────────────────────────────────────
+  # ── 4. Capture backend URL ──────────────────────────────────────────────────
   - name: gcr.io/google.com/cloudsdktool/cloud-sdk
     id: get-backend-url
     entrypoint: bash
     args:
       - -c
       - |
-        URL=$(gcloud run services describe ${_BACKEND_SERVICE} \
+        URL=$$(gcloud run services describe ${_BACKEND_SERVICE} \
           --region=${_REGION} --format='value(status.url)')
         echo "Backend URL: $$URL"
         echo "$$URL" > /workspace/backend_url.txt
-    waitFor: [deploy-backend]
+    waitFor:
+      - deploy-backend
 
-  # ── 5. Build frontend image (injects backend URL) ───────────────────────────
+  # ── 5. Build frontend (injects backend URL at build time) ──────────────────
   - name: gcr.io/cloud-builders/docker
     id: build-frontend
     entrypoint: bash
     args:
       - -c
       - |
-        BACKEND_URL=$(cat /workspace/backend_url.txt)
+        BACKEND_URL=$$(cat /workspace/backend_url.txt)
         docker build \
           --build-arg NEXT_PUBLIC_API_URL=$$BACKEND_URL \
-          -t ${_REPO}/frontend:$SHORT_SHA \
+          -t ${_REPO}/frontend:${SHORT_SHA} \
           -t ${_REPO}/frontend:latest \
           -f frontend/Dockerfile \
           frontend/
-    waitFor: [get-backend-url]
+    waitFor:
+      - get-backend-url
 
   # ── 6. Push frontend image ──────────────────────────────────────────────────
   - name: gcr.io/cloud-builders/docker
@@ -91,7 +96,8 @@ steps:
       - push
       - --all-tags
       - ${_REPO}/frontend
-    waitFor: [build-frontend]
+    waitFor:
+      - build-frontend
 
   # ── 7. Deploy frontend to Cloud Run ─────────────────────────────────────────
   - name: gcr.io/google.com/cloudsdktool/cloud-sdk
@@ -100,9 +106,9 @@ steps:
     args:
       - -c
       - |
-        BACKEND_URL=$(cat /workspace/backend_url.txt)
+        BACKEND_URL=$$(cat /workspace/backend_url.txt)
         gcloud run deploy ${_FRONTEND_SERVICE} \
-          --image=${_REPO}/frontend:$SHORT_SHA \
+          --image=${_REPO}/frontend:${SHORT_SHA} \
           --region=${_REGION} \
           --platform=managed \
           --allow-unauthenticated \
@@ -114,9 +120,10 @@ steps:
           --concurrency=80 \
           --set-env-vars=NODE_ENV=production,NEXT_PUBLIC_API_URL=$$BACKEND_URL \
           --quiet
-    waitFor: [push-frontend]
+    waitFor:
+      - push-frontend
 
-  # ── 8. Print deployed URLs ──────────────────────────────────────────────────
+  # ── 8. Print live URLs ──────────────────────────────────────────────────────
   - name: gcr.io/google.com/cloudsdktool/cloud-sdk
     id: print-urls
     entrypoint: bash
@@ -124,12 +131,7 @@ steps:
       - -c
       - |
         echo "=== DEPLOYED ==="
-        echo "Backend:  $(gcloud run services describe ${_BACKEND_SERVICE} --region=${_REGION} --format='value(status.url)')"
-        echo "Frontend: $(gcloud run services describe ${_FRONTEND_SERVICE} --region=${_REGION} --format='value(status.url)')"
-    waitFor: [deploy-frontend]
-
-images:
-  - ${_REPO}/backend:$SHORT_SHA
-  - ${_REPO}/backend:latest
-  - ${_REPO}/frontend:$SHORT_SHA
-  - ${_REPO}/frontend:latest
+        echo "Backend:  $$(gcloud run services describe ${_BACKEND_SERVICE} --region=${_REGION} --format='value(status.url)')"
+        echo "Frontend: $$(gcloud run services describe ${_FRONTEND_SERVICE} --region=${_REGION} --format='value(status.url)')"
+    waitFor:
+      - deploy-frontend

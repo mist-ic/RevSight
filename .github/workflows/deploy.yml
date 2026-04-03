@@ -1,0 +1,116 @@
+name: Deploy to Cloud Run
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch: # allow manual trigger from CLI: gh workflow run
+
+env:
+  REGION: asia-south1
+  REPO: asia-south1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/revsight
+  BACKEND_SERVICE: revsight-backend
+  FRONTEND_SERVICE: revsight-frontend
+
+jobs:
+  deploy:
+    name: Build & Deploy
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      # ── Checkout ────────────────────────────────────────────────────────────
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # ── Auth to GCP ─────────────────────────────────────────────────────────
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up gcloud CLI
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+
+      # ── Configure Docker for Artifact Registry ───────────────────────────────
+      - name: Configure Docker
+        run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
+
+      # ── Build & push backend ─────────────────────────────────────────────────
+      - name: Build backend image
+        run: |
+          docker build \
+            -t ${{ env.REPO }}/backend:${{ github.sha }} \
+            -t ${{ env.REPO }}/backend:latest \
+            -f backend/Dockerfile \
+            backend/
+
+      - name: Push backend image
+        run: docker push --all-tags ${{ env.REPO }}/backend
+
+      # ── Deploy backend ────────────────────────────────────────────────────────
+      - name: Deploy backend to Cloud Run
+        run: |
+          gcloud run deploy ${{ env.BACKEND_SERVICE }} \
+            --image=${{ env.REPO }}/backend:${{ github.sha }} \
+            --region=${{ env.REGION }} \
+            --platform=managed \
+            --allow-unauthenticated \
+            --min-instances=0 \
+            --max-instances=2 \
+            --memory=512Mi \
+            --cpu=1 \
+            --timeout=300 \
+            --concurrency=10 \
+            --set-secrets=GEMINI_API_KEY=gemini-api-key:latest,DATABASE_URL=database-url:latest \
+            --set-env-vars=LANGCHAIN_TRACING_V2=false,ENVIRONMENT=production,REQUIRE_APPROVAL=false \
+            --quiet
+
+      # ── Get backend URL for frontend build ────────────────────────────────────
+      - name: Get backend URL
+        id: backend_url
+        run: |
+          URL=$(gcloud run services describe ${{ env.BACKEND_SERVICE }} \
+            --region=${{ env.REGION }} \
+            --format='value(status.url)')
+          echo "url=$URL" >> $GITHUB_OUTPUT
+          echo "Backend URL: $URL"
+
+      # ── Build & push frontend (with backend URL baked in) ─────────────────────
+      - name: Build frontend image
+        run: |
+          docker build \
+            --build-arg NEXT_PUBLIC_API_URL=${{ steps.backend_url.outputs.url }} \
+            -t ${{ env.REPO }}/frontend:${{ github.sha }} \
+            -t ${{ env.REPO }}/frontend:latest \
+            -f frontend/Dockerfile \
+            frontend/
+
+      - name: Push frontend image
+        run: docker push --all-tags ${{ env.REPO }}/frontend
+
+      # ── Deploy frontend ────────────────────────────────────────────────────────
+      - name: Deploy frontend to Cloud Run
+        run: |
+          gcloud run deploy ${{ env.FRONTEND_SERVICE }} \
+            --image=${{ env.REPO }}/frontend:${{ github.sha }} \
+            --region=${{ env.REGION }} \
+            --platform=managed \
+            --allow-unauthenticated \
+            --min-instances=0 \
+            --max-instances=2 \
+            --memory=512Mi \
+            --cpu=1 \
+            --timeout=60 \
+            --concurrency=80 \
+            --set-env-vars=NODE_ENV=production,NEXT_PUBLIC_API_URL=${{ steps.backend_url.outputs.url }} \
+            --quiet
+
+      # ── Print live URLs ────────────────────────────────────────────────────────
+      - name: Print deployed URLs
+        run: |
+          echo "=== DEPLOYED ==="
+          echo "Backend:  $(gcloud run services describe ${{ env.BACKEND_SERVICE }} --region=${{ env.REGION }} --format='value(status.url)')"
+          echo "Frontend: $(gcloud run services describe ${{ env.FRONTEND_SERVICE }} --region=${{ env.REGION }} --format='value(status.url)')"
