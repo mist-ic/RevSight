@@ -20,6 +20,7 @@ dependencies = [
     "asyncpg>=0.30.0",
     "httpx>=0.28.0",
     "sse-starlette>=2.2.0",
+    "mcp[cli]>=1.0.0",
 ]
 
 [tool.hatch.build.targets.wheel]

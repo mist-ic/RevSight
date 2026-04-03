@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  :root {
+    --bg: #ffffff; --surface: #ffffff; --text: #000000; --text-muted: #666666;
+    --accent: #000000; --border: #e5e5e5; --radius: 8px; --font-heading: system-ui; --font-body: system-ui;
+    --skeleton-bg: rgba(0,0,0,0.04);
+    --status-good: #22c55e;
+    --chart-1: #3b82f6; --chart-2: #8b5cf6; --chart-3: #ec4899; --chart-4: #f43f5e; --chart-5: #f97316;
+  }
+  
+  /* --- 1. Editorial 2.5D (2c Colors + 5a Shadows) --- */
+  /* Pale olive tone, deep green serif text, but using the sharp layered drop shadows of 5a */
+  [data-theme="fusion-1"] { 
+    --bg:#F5F5F0; --surface:#ffffff; --text:#142918; --text-muted:#6B7A6E; --accent:#166534; --border:#d4d4cd; --radius:8px; 
+    --font-heading:'Palatino', 'Georgia', serif; --font-body:-apple-system, sans-serif; 
+    --status-good:#15803d; --chart-1:#115e59; --chart-2:#3f6212; --chart-3:#ca8a04; --chart-4:#b45309; --chart-5:#9f1239; 
+  }
+  [data-theme="fusion-1"] .card { 
+    border: 1px solid var(--border); 
+    box-shadow: 2px 2px 0px #e4e4df, 4px 4px 0px #cfcfc7; 
+  }
+
+  /* --- 2. Structural Zine (5b Typography/Accent + 5a Dual Shadow) --- */
+  /* Warm beige vibe, monospaced data, but anchored heavily with 5a's physical depth */
+  [data-theme="fusion-2"] { 
+    --bg:#f4f1e1; --surface:#ffffff; --text:#1e293b; --text-muted:#64748b; --accent:#1e3a8a; --border:#1e293b; --radius:0px; 
+    --font-heading:'Georgia', serif; --font-body:system-ui; 
+    --status-good:#15803d; --chart-1:#1e3a8a; --chart-2:#ea580c; --chart-3:#b45309; --chart-4:#15803d; --chart-5:#be123c; 
+  }
+  [data-theme="fusion-2"] .card { 
+    border:1px solid var(--border); 
+    box-shadow: -2px 2px 0px rgba(30,58,138,0.2), -4px 4px 0px rgba(30,58,138,0.1); 
+    position: relative; 
+  }
+  [data-theme="fusion-2"] .card::before { 
+    content:''; position:absolute; top:-1px; left:-1px; width:6px; height:6px; background:var(--text); 
+  }
+  [data-theme="fusion-2"] .data-el { font-family: 'Courier New', monospace; } /* Apply mono to data */
+  [data-theme="fusion-2"] h1, [data-theme="fusion-2"] h2 { font-family: 'Georgia', serif; }
+
+  /* --- 3. Clean Slate Olive (2c Olive BG + 5a Architecture) --- */
+  /* Olive background but removing the green text to be high-end charcoal, preserving 5a's crispness */
+  [data-theme="fusion-3"] { 
+    --bg:#F5F5F0; --surface:#ffffff; --text:#1c1917; --text-muted:#78716c; --accent:#ea580c; --border:#e7e5e4; --radius:12px; 
+    --font-heading:-apple-system, sans-serif; --font-body:-apple-system, sans-serif; 
+    --status-good:#16a34a; --chart-1:#b45309; --chart-2:#ea580c; --chart-3:#ca8a04; --chart-4:#4d7c0f; --chart-5:#0f766e; 
+  }
+  [data-theme="fusion-3"] .card { 
+    border: 1px solid var(--border); 
+    box-shadow: 2px 2px 0px #e7e5e4, 4px 4px 0px #d6d3d1; 
+  }
+
+  /* --- 4. Warm Architect (5b Warmth + 2c Soft Blur Shadow) --- */
+  /* Zine background and borders, but utilizing the gorgeous floating soft blur from 2c instead of hard blocks */
+  [data-theme="fusion-4"] { 
+    --bg:#f4f1e1; --surface:#ffffff; --text:#292524; --text-muted:#78716c; --accent:#b91c1c; --border:#e7e5e4; --radius:4px; 
+    --font-heading:'Palatino', 'Georgia', serif; --font-body:system-ui; 
+    --status-good:#15803d; --chart-1:#b91c1c; --chart-2:#431407; --chart-3:#b45309; --chart-4:#14532d; --chart-5:#1e3a8a; 
+  }
+  [data-theme="fusion-4"] .card { 
+    border:1px solid var(--border); 
+    box-shadow:0 12px 30px -10px rgba(41,37,36,0.15); 
+    position: relative; 
+  }
+  [data-theme="fusion-4"] .card::before { 
+    content:''; position:absolute; top:-2px; left:-2px; width:8px; height:8px; background:var(--border); 
+  }
+
+  /* --- 5. The Synthesis (The Ultimate Mix) --- */
+  /* Blends 2c's olive tones, 5a's dual-drop layered perfection, and 5b's stark elegant printed fonts. */
+  [data-theme="fusion-5"] { 
+    --bg:#F2F2ED; --surface:#ffffff; --text:#202B21; --text-muted:#6B7A6E; --accent:#D46B23; --border:#DBD7CE; --radius:6px; 
+    --font-heading:'Georgia', serif; --font-body:-apple-system, sans-serif; 
+    --status-good:#2F6F3A; --chart-1:#1A3C34; --chart-2:#2F6F3A; --chart-3:#D46B23; --chart-4:#A64219; --chart-5:#B19D82; 
+  }
+  [data-theme="fusion-5"] .card { 
+    border: 1px solid var(--border); 
+    box-shadow: 3px 3px 0px #E5E1D6, 6px 6px 0px #D1CCC0; 
+  }
+  [data-theme="fusion-5"] .card h2 { border-bottom: 1px solid var(--border); padding-bottom: 16px; margin-bottom: 24px; }
+
+
+  /* --- Layout & Utilities --- */
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--font-body); transition: all 0.3s ease; }
+  h1, h2, h3 { font-family: var(--font-heading); margin: 0; font-weight: 600; letter-spacing: -0.5px; }
+  
+  .layout { display: grid; grid-template-columns: 240px 1fr; height: 100vh; }
+  .sidebar { border-right: 1px solid var(--border); padding: 32px 24px; display: flex; flex-direction: column; gap: 24px; background: var(--surface); z-index: 10; }
+  .main { padding: 48px; overflow-y: auto; overflow-x: hidden; }
+  
+  .card { background: var(--surface); padding: 32px; transition: box-shadow 0.2s ease, transform 0.2s ease; overflow: hidden; }
+  
+  /* Soft skeleton loading state */
+  .load-el.skeleton {
+    background-color: var(--skeleton-bg);
+    border-radius: 4px;
+    animation: delicate-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+  @keyframes delicate-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  .loader-text {
+    font-size: 13px; color: var(--text-muted); margin-bottom: 6px; font-weight: 500;
+    text-transform: uppercase; letter-spacing: 1px;
+    animation: fadePulse 2s infinite alternate;
+  }
+  @keyframes fadePulse { from { opacity: 0.4; } to { opacity: 1; } }
+  
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-bottom: 24px; }
+  .grid-2 { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; }
+  
+  /* Flat Navigation Bar */
+  .btn-group-grid {
+    position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); display: flex; gap: 12px;
+    background: rgba(255,255,255,0.95); padding: 12px 24px; border-radius: 50px;
+    border: 1px solid rgba(0,0,0,0.1); box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+    z-index: 100; backdrop-filter: blur(10px); align-items: center; justify-content: center;
+  }
+  .grid-btn { 
+    padding: 8px 16px; border-radius: 20px; border: 1px solid rgba(0,0,0,0.1); 
+    background: white; color: black; cursor: pointer; font-weight: bold; font-size: 13px; 
+    transition: all 0.15s; font-family: system-ui; 
+  }
+  .grid-btn:hover { background: #f0f0f0; transform: translateY(-2px); }
+  .grid-btn.active { background: black; color: white; border-color: black; }
+  
+  .theme-title { margin-bottom: 12px; font-size: 14px; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); font-weight: bold; }
+</style>
+</head>
+<body data-theme="fusion-1">
+  <div class="layout">
+    <div class="sidebar">
+      <h2 style="font-size: 20px;">RevSight</h2>
+      <div style="display:flex; flex-direction:column; gap:16px; margin-top:24px;">
+        <div class="data-el" style="color:var(--text); font-weight:500;">Pipelines</div>
+        <div class="data-el" style="color:var(--text-muted)">Accounts</div>
+        <div class="data-el" style="color:var(--text-muted)">Forecast</div>
+      </div>
+    </div>
+    
+    <div class="main">
+      <div class="theme-title" id="theme-name">1. Editorial 2.5D (2c colors, 5a dual-shadow)</div>
+      <div style="display:flex; justify-content:space-between; margin-bottom: 40px; align-items: flex-end;">
+        <div>
+           <h1 id="page-title" style="font-size: 32px">Revenue Command</h1>
+           <p style="color:var(--text-muted); margin-top: 8px;">Q3 Enterprise Analysis</p>
+        </div>
+        <button onclick="toggleLoad()" style="padding: 12px 24px; font-weight: bold; font-family: var(--font-body); border-radius: var(--radius); background: var(--surface); color: var(--text); border: 1px solid var(--border); cursor:pointer; box-shadow: 2px 2px 0px rgba(0,0,0,0.1);">Re-run Cold Start</button>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <div style="color:var(--text-muted); font-size:13px; margin-bottom:12px; letter-spacing:1px; text-transform:uppercase;">Coverage</div>
+          <div class="data-el" style="font-size:36px; font-weight:bold; font-family:var(--font-heading)">4.2x</div>
+          <div class="load-el" style="display:none;">
+            <div class="loader-text">Computing SQL...</div>
+            <div class="skeleton" style="height:32px; width:70%"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div style="color:var(--text-muted); font-size:13px; margin-bottom:12px; letter-spacing:1px; text-transform:uppercase;">Win Rate</div>
+          <div class="data-el" style="font-size:36px; font-weight:bold; font-family:var(--font-heading)">28%</div>
+          <div class="load-el" style="display:none;">
+            <div class="loader-text">Analyzing deals...</div>
+            <div class="skeleton" style="height:32px; width:50%"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div style="color:var(--text-muted); font-size:13px; margin-bottom:12px; letter-spacing:1px; text-transform:uppercase;">Velocity</div>
+          <div class="data-el" style="font-size:36px; font-weight:bold; font-family:var(--font-heading)">62d</div>
+          <div class="load-el" style="display:none;">
+            <div class="loader-text">Awaiting data...</div>
+            <div class="skeleton" style="height:32px; width:60%"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div style="color:var(--text-muted); font-size:13px; margin-bottom:12px; letter-spacing:1px; text-transform:uppercase;">Confidence</div>
+          <div class="data-el" style="font-size:36px; font-weight:bold; font-family:var(--font-heading); color: var(--status-good)">High</div>
+          <div class="load-el" style="display:none;">
+            <div class="loader-text">Evaluating risk...</div>
+            <div class="skeleton" style="height:32px; width:80%"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card" style="min-height:300px">
+          <h2 style="font-size:18px; margin-bottom:32px">Stage Conversion</h2>
+          <div class="data-el" style="display:flex; align-items:flex-end; gap:6px; height:200px">
+            <div style="flex:1; background:var(--chart-1); height:100%;"></div>
+            <div style="flex:1; background:var(--chart-2); height:85%;"></div>
+            <div style="flex:1; background:var(--chart-3); height:60%;"></div>
+            <div style="flex:1; background:var(--chart-4); height:45%;"></div>
+            <div style="flex:1; background:var(--chart-5); height:30%;"></div>
+          </div>
+          <div class="load-el" style="display:none; height:200px; display:flex; flex-direction:column; justify-content:center; align-items:center;">
+             <div class="loader-text">Building funnel...</div>
+             <div class="skeleton" style="height:100px; width:100%; max-width:400px; margin-top:20px;"></div>
+          </div>
+        </div>
+
+        <div class="card" style="min-height:300px">
+          <h2 style="font-size:18px; margin-bottom:32px">Executive Summary</h2>
+          <div class="data-el" style="line-height:1.7; font-size: 15px; color: var(--text);">
+            <p style="margin-top:0">The pipeline shows strong coverage at 4.2x. Win rates are stable.</p>
+            <p>No immediate <span style="font-weight:bold; color:var(--accent);">risks</span> detected in Q3 Enterprise data. Forecast confidence is calculated as high.</p>
+          </div>
+          <div class="load-el" style="display:none; flex-direction:column; gap:16px;">
+             <div class="loader-text">Generating narrative...</div>
+            <div class="skeleton" style="height:16px; width:100%;"></div>
+            <div class="skeleton" style="height:16px; width:95%;"></div>
+            <div class="skeleton" style="height:16px; width:80%;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="btn-group-grid">
+    <button class="grid-btn active" onclick="setTheme('fusion-1', '1. Editorial 2.5D (2c colors, 5a dual-shadow)')">Fusion 1</button>
+    <button class="grid-btn" onclick="setTheme('fusion-2', '2. Structural Zine (5b vibe, 5a dual-shadow)')">Fusion 2</button>
+    <button class="grid-btn" onclick="setTheme('fusion-3', '3. Clean Slate Olive (2c colors, 5a architecture)')">Fusion 3</button>
+    <button class="grid-btn" onclick="setTheme('fusion-4', '4. Warm Architect (5b dots, 2c blur shadows)')">Fusion 4</button>
+    <button class="grid-btn" onclick="setTheme('fusion-5', '5. The Synthesis (The Ultimate Mix)')">Fusion 5</button>
+  </div>
+
+  <script>
+    let loading = true;
+    function renderState() {
+      document.querySelectorAll('.data-el').forEach(el => el.style.display = loading ? 'none' : 'block');
+      document.querySelectorAll('.load-el').forEach(el => el.style.display = loading ? 'block' : 'none');
+      
+      const chart = document.querySelector('.grid-2 .card:nth-child(1) .data-el');
+      if (chart) chart.style.display = loading ? 'none' : 'flex';
+      const loadChart = document.querySelector('.grid-2 .card:nth-child(1) .load-el');
+      if (loadChart) loadChart.style.display = loading ? 'flex' : 'none';
+      
+      const summaryLoad = document.querySelector('.grid-2 .card:nth-child(2) .load-el');
+      if (summaryLoad) summaryLoad.style.display = loading ? 'flex' : 'none';
+    }
+
+    renderState(); 
+
+    setTimeout(() => {
+      loading = false;
+      renderState();
+    }, 3000);
+
+    function toggleLoad() {
+      loading = true;
+      renderState();
+      clearTimeout(window.loaderTimeout);
+      window.loaderTimeout = setTimeout(() => {
+        loading = false;
+        renderState();
+      }, 3000);
+    }
+
+    function setTheme(theme, title) {
+      document.body.setAttribute('data-theme', theme);
+      document.getElementById('theme-name').innerText = title;
+      
+      document.querySelectorAll('.grid-btn').forEach(b => b.classList.remove('active'));
+      const activeBtnMatch = Array.from(document.querySelectorAll('.grid-btn'))
+          .find(el => el.getAttribute('onclick') && el.getAttribute('onclick').includes("'" + theme + "'"));
+      if (activeBtnMatch) activeBtnMatch.classList.add('active');
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  /* Base defaults */
+  :root {
+    --bg: #ffffff; --surface: #ffffff; --text: #000000; --text-muted: #666666;
+    --accent: #000000; --border: #000000; --radius: 0px; --font-heading: system-ui; --font-body: system-ui;
+  }
+  
+  /* 1. Grid Brutalism (Evolving from #1 & #5: rigid grid, light mode, 1px lines everywhere) */
+  [data-theme="grid"] {
+    --bg: #ffffff; --surface: #ffffff; --text: #000000; --text-muted: #555555;
+    --accent: #2563eb; --border: #000000; --radius: 0px; 
+    --font-heading: 'Courier New', monospace; --font-body: -apple-system, sans-serif;
+  }
+  [data-theme="grid"] .card, [data-theme="grid"] .sidebar { border-width: 1px; box-shadow: none; }
+  
+  /* 2. Warm Editorial (Evolving from #3: creamy off-white, elegant serifs, charcoal text) */
+  [data-theme="warm"] {
+    --bg: #fcfbf8; --surface: #ffffff; --text: #2b2a27; --text-muted: #827e77;
+    --accent: #9c6f44; --border: #eceae4; --radius: 8px;
+    --font-heading: 'Times New Roman', Times, serif; --font-body: 'Helvetica Neue', Arial, sans-serif;
+  }
+  [data-theme="warm"] .card { box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: none; }
+
+  /* 3. Modern Enterprise Teal (A refined corporate take on structured minimalism) */
+  [data-theme="corp"] {
+    --bg: #f8fafc; --surface: #ffffff; --text: #0f172a; --text-muted: #64748b;
+    --accent: #0f766e; --border: #e2e8f0; --radius: 12px;
+    --font-heading: 'Inter', system-ui; --font-body: 'Inter', system-ui;
+  }
+  [data-theme="corp"] .card { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
+
+  /* 4. Luxury Dark Deco (Since dark modes failed previously, an alternative warm-dark palette with gold/tan accents) */
+  [data-theme="deco"] {
+    --bg: #1c1a17; --surface: #24221f; --text: #eae6d7; --text-muted: #9c968c;
+    --accent: #d4af37; --border: #3b3731; --radius: 0px;
+    --font-heading: 'Georgia', serif; --font-body: system-ui;
+  }
+  [data-theme="deco"] .card { border: 1px solid var(--border); box-shadow: none; }
+
+  /* 5. Bauhaus Modular (Evolving from #5: thick strict borders, distinct red accent, minimal spacing) */
+  [data-theme="bauhaus"] {
+    --bg: #f4efeb; --surface: #ffffff; --text: #1a1a1a; --text-muted: #4a4a4a;
+    --accent: #e34234; --border: #1a1a1a; --radius: 0px;
+    --font-heading: 'Arial', sans-serif; --font-body: 'Arial', sans-serif;
+  }
+  [data-theme="bauhaus"] .card { border: 2px solid var(--border); box-shadow: 6px 6px 0px var(--border); }
+
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--font-body); transition: all 0.3s ease; }
+  h1, h2 { font-family: var(--font-heading); margin: 0; font-weight: 600; letter-spacing: -0.5px; }
+  
+  .layout { display: grid; grid-template-columns: 240px 1fr; height: 100vh; }
+  .sidebar { border-right: 1px solid var(--border); padding: 32px 24px; display: flex; flex-direction: column; gap: 24px; background: var(--surface); }
+  .main { padding: 48px; overflow-y: auto; }
+  
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 32px; }
+  
+  /* Advanced Skeleton Loader matching the aesthetic */
+  .skeleton { background: linear-gradient(90deg, transparent 0%, rgba(150,150,150,0.1) 50%, transparent 100%); background-size: 200% 100%; animation: shimmer 1.5s infinite linear; border-radius: 4px; background-color: var(--border); opacity: 0.5; }
+  @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+  
+  /* Utilities */
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-bottom: 24px; }
+  .grid-2 { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; }
+  
+  .btn-group { position: fixed; bottom: 30px; right: 30px; display: flex; gap: 8px; background: var(--bg); padding: 12px; border-radius: 50px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.1); z-index: 100; }
+  .btn { width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--border); background: var(--surface); color: var(--text); cursor: pointer; font-weight: bold; transition: all 0.2s; font-family: var(--font-body); }
+  .btn:hover { transform: translateY(-2px); }
+  .btn.active { background: var(--text); color: var(--bg); border-color: var(--text); }
+  
+  .theme-title { margin-bottom: 12px; font-size: 14px; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); font-weight: bold; }
+</style>
+</head>
+<body data-theme="grid">
+  <div class="layout">
+    <div class="sidebar">
+      <h2 style="font-size: 20px;">RevSight</h2>
+      <div style="display:flex; flex-direction:column; gap:16px; margin-top:24px;">
+        <div class="data-el" style="color:var(--text); font-weight:500;">Pipelines</div>
+        <div class="data-el" style="color:var(--text-muted)">Accounts</div>
+        <div class="data-el" style="color:var(--text-muted)">Forecast</div>
+      </div>
+    </div>
+    
+    <div class="main">
+      <div class="theme-title" id="theme-name">1. Grid Brutalism</div>
+      <div style="display:flex; justify-content:space-between; margin-bottom: 40px; align-items: flex-end;">
+        <div>
+           <h1 id="page-title" style="font-size: 32px">Revenue Command</h1>
+           <p style="color:var(--text-muted); margin-top: 8px;">Q3 Enterprise Analysis</p>
+        </div>
+        <button onclick="toggleLoad()" style="padding: 12px 24px; font-weight: bold; font-family: var(--font-body); border-radius: var(--radius); background: var(--surface); color: var(--text); border: 2px solid var(--border); cursor:pointer;">Cold Start Toggle</button>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <div style="color:var(--text-muted); font-size:14px; margin-bottom:12px; letter-spacing:1px; text-transform:uppercase;">Coverage</div>
+          <div class="data-el" style="font-size:36px; font-weight:bold; font-family:var(--font-heading)">4.2x</div>
+          <div class="load-el skeleton" style="height:40px; width:60%"></div>
+        </div>
+        <div class="card">
+          <div style="color:var(--text-muted); font-size:14px; margin-bottom:12px; letter-spacing:1px; text-transform:uppercase;">Win Rate</div>
+          <div class="data-el" style="font-size:36px; font-weight:bold; font-family:var(--font-heading)">28%</div>
+          <div class="load-el skeleton" style="height:40px; width:60%"></div>
+        </div>
+        <div class="card">
+          <div style="color:var(--text-muted); font-size:14px; margin-bottom:12px; letter-spacing:1px; text-transform:uppercase;">Velocity</div>
+          <div class="data-el" style="font-size:36px; font-weight:bold; font-family:var(--font-heading)">62d</div>
+          <div class="load-el skeleton" style="height:40px; width:60%"></div>
+        </div>
+        <div class="card">
+          <div style="color:var(--text-muted); font-size:14px; margin-bottom:12px; letter-spacing:1px; text-transform:uppercase;">Confidence</div>
+          <div class="data-el" style="font-size:36px; font-weight:bold; font-family:var(--font-heading); color: var(--accent)">High</div>
+          <div class="load-el skeleton" style="height:40px; width:60%"></div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card" style="min-height:300px">
+          <h2 style="font-size:18px; margin-bottom:32px">Stage Conversion</h2>
+          <div class="data-el" style="display:flex; align-items:flex-end; gap:4px; height:200px">
+            <div style="flex:1; background:var(--text); height:100%; opacity:1.0;"></div>
+            <div style="flex:1; background:var(--text); height:85%; opacity:0.8;"></div>
+            <div style="flex:1; background:var(--text); height:60%; opacity:0.6;"></div>
+            <div style="flex:1; background:var(--text); height:45%; opacity:0.4;"></div>
+            <div style="flex:1; background:var(--text); height:30%; opacity:0.2;"></div>
+          </div>
+          <div class="load-el skeleton" style="height:200px; width:100%"></div>
+        </div>
+
+        <div class="card" style="min-height:300px">
+          <h2 style="font-size:18px; margin-bottom:32px">Executive Summary</h2>
+          <div class="data-el" style="line-height:1.7; font-size: 15px; color: var(--text);">
+            <p style="margin-top:0">The pipeline shows strong coverage at 4.2x. Win rates are stable.</p>
+            <p>No immediate risks detected in Q3 Enterprise data. Forecast confidence is calculated as high.</p>
+          </div>
+          <div class="load-el" style="display:flex; flex-direction:column; gap:12px">
+            <div class="skeleton" style="height:12px; width:100%;"></div>
+            <div class="skeleton" style="height:12px; width:95%;"></div>
+            <div class="skeleton" style="height:12px; width:80%;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="btn-group">
+    <button class="btn active" onclick="setTheme('grid', 1, '1. Grid Brutalism')">1</button>
+    <button class="btn" onclick="setTheme('warm', 2, '2. Warm Editorial')">2</button>
+    <button class="btn" onclick="setTheme('corp', 3, '3. Modern Teal')">3</button>
+    <button class="btn" onclick="setTheme('deco', 4, '4. Luxe Dark Deco')">4</button>
+    <button class="btn" onclick="setTheme('bauhaus', 5, '5. Bauhaus Modular')">5</button>
+  </div>
+
+  <script>
+    let loading = true;
+    
+    function renderState() {
+      document.querySelectorAll('.data-el').forEach(el => el.style.display = loading ? 'none' : 'block');
+      document.querySelectorAll('.load-el').forEach(el => el.style.display = loading ? 'block' : 'none');
+      // Ensure the chart maintains its flex box layout instead of block
+      const chart = document.querySelector('.grid-2 .card:nth-child(1) .data-el');
+      if (chart) chart.style.display = loading ? 'none' : 'flex';
+    }
+
+    // Initialize with skeletons showing
+    renderState(); 
+
+    // Auto-load data after 3 seconds
+    setTimeout(() => {
+      loading = false;
+      renderState();
+    }, 3000);
+
+    function toggleLoad() {
+      loading = !loading;
+      renderState();
+    }
+
+    function setTheme(theme, idx, title) {
+      document.body.setAttribute('data-theme', theme);
+      document.getElementById('theme-name').innerText = title;
+      document.querySelectorAll('.btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.btn')[idx-1].classList.add('active');
+    }
+  </script>
+</body>
+</html>

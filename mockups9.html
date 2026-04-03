@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  :root {
+    --bg: #ffffff; --surface: #ffffff; --text: #000000; --text-muted: #666666;
+    --accent: #000000; --border: #e5e5e5; --radius: 8px; --font-heading: system-ui; --font-body: system-ui;
+    --skeleton-bg: rgba(0,0,0,0.04);
+    --status-good: #22c55e;
+    --chart-1: #3b82f6; --chart-2: #8b5cf6; --chart-3: #ec4899; --chart-4: #f43f5e; --chart-5: #f97316;
+  }
+  
+  /* --- ROW 1 --- */
+  /* 1a (KEEPER): Soft Neo-Brutalism (Toned down) */
+  [data-theme="1a"] { --bg:#FAF8F5; --surface:#fff; --text:#1a1a1a; --text-muted:#737373; --accent:#e11d48; --border:rgba(0,0,0,0.15); --radius:4px; --font-heading:'Helvetica Neue', sans-serif; --font-body:'Helvetica Neue', sans-serif; --status-good: #16a34a; --chart-1: #2563eb; --chart-2: #4f46e5; --chart-3: #7c3aed; --chart-4: #c026d3; --chart-5: #e11d48; }
+  [data-theme="1a"] .card { border:1px solid var(--border); box-shadow:3px 3px 0px rgba(0,0,0,0.08); }
+  
+  /* 1c (KEEPER): Pastel Blue Brutalism */
+  [data-theme="1c"] { --bg:#F0F4F8; --surface:#ffffff; --text:#2c3e50; --text-muted:#7f8c8d; --accent:#e74c3c; --border:#2c3e50; --radius:4px; --font-heading:'Trebuchet MS', sans-serif; --font-body:system-ui; --status-good:#27ae60; --chart-1:#2980b9; --chart-2:#8e44ad; --chart-3:#d35400; --chart-4:#c0392b; --chart-5:#f39c12; }
+  [data-theme="1c"] .card { border:1px solid var(--border); box-shadow:3px 3px 0px rgba(44,62,80,0.3); }
+
+  /* --- ROW 2 --- */
+  /* 2a (KEEPER): Advanced Typographic Blueprint */
+  [data-theme="2a"] { --bg:#fdfdfc; --surface:transparent; --text:#1c1917; --text-muted:#78716c; --accent:#b91c1c; --border:#e7e5e4; --radius:0px; --font-heading:'Georgia', serif; --font-body:-apple-system, sans-serif; --status-good:#059669; --chart-1:#3b82f6; --chart-2:#10b981; --chart-3:#f59e0b; --chart-4:#ef4444; --chart-5:#8b5cf6; }
+  [data-theme="2a"] .card { border:none; box-shadow:none; border-bottom: 1px solid var(--border); padding-left: 0; padding-right: 0; }
+  [data-theme="2a"] .grid-2 .card { border-right: 1px solid var(--border); padding-right: 32px; border-bottom: none; }
+  [data-theme="2a"] .grid-2 .card:nth-child(2) { border-right: none; padding-right: 0; padding-left: 32px; }
+  
+  /* 2c (KEEPER): Pale Olive Editorial */
+  [data-theme="2c"] { --bg:#F5F5F0; --surface:#ffffff; --text:#142918; --text-muted:#6B7A6E; --accent:#166534; --border:#e9e9e1; --radius:16px; --font-heading:'Palatino', serif; --font-body:-apple-system, sans-serif; --status-good:#15803d; --chart-1:#115e59; --chart-2:#3f6212; --chart-3:#ca8a04; --chart-4:#b45309; --chart-5:#9f1239; }
+  [data-theme="2c"] .card { border:1px solid var(--border); box-shadow:0 12px 30px -10px rgba(22,101,52,0.1); }
+
+  /* --- ROW 3 --- */
+  /* 3a (KEEPER): Vibrant Soft Float */
+  [data-theme="3a"] { --bg:#f9fafb; --surface:#ffffff; --text:#111827; --text-muted:#6b7280; --accent:#4f46e5; --border:#f3f4f6; --radius:16px; --font-heading:system-ui; --font-body:system-ui; --status-good:#10b981; --chart-1:#4f46e5; --chart-2:#06b6d4; --chart-3:#f59e0b; --chart-4:#ec4899; --chart-5:#8b5cf6; }
+  [data-theme="3a"] .card { border:1px solid var(--border); box-shadow: 0 20px 40px rgba(0,0,0,0.03), 0 1px 3px rgba(0,0,0,0.02); }
+  
+  /* 3c (KEEPER): Warm Mute */
+  [data-theme="3c"] { --bg:#FAF5F0; --surface:#ffffff; --text:#431407; --text-muted:#78350f; --accent:#c2410c; --border:#fdba74; --radius:6px; --font-heading:system-ui; --font-body:system-ui; --status-good:#65a30d; --chart-1:#c2410c; --chart-2:#b45309; --chart-3:#4d7c0f; --chart-4:#0369a1; --chart-5:#6d28d9; }
+  [data-theme="3c"] .card { border:1px solid var(--border); box-shadow:3px 3px 0px rgba(194,65,12,0.1); }
+
+  /* --- ROW 4 --- */
+  /* 4a (KEEPER): Editorial Crisp */
+  [data-theme="4a"] { --bg:#F5EFEB; --surface:#fff; --text:#2f2a24; --text-muted:#968c83; --accent:#c2410c; --border:transparent; --radius:0px; --font-heading:'Times New Roman', serif; --font-body:system-ui; --status-good:#166534; --chart-1:#451a03; --chart-2:#78350f; --chart-3:#b45309; --chart-4:#ea580c; --chart-5:#d97706; }
+  [data-theme="4a"] .card { box-shadow:0 4px 12px rgba(47,42,36,0.08); border-top:3px solid var(--text); }
+  
+  /* 4b (KEEPER): 2.5D Layering / Isometric Offset */
+  [data-theme="4b"] { --bg:#e5e7eb; --surface:#ffffff; --text:#111827; --text-muted:#6b7280; --accent:#4f46e5; --border:#000000; --radius:0px; --font-heading:'Arial', sans-serif; --font-body:'Arial', sans-serif; --status-good:#059669; --chart-1:#4f46e5; --chart-2:#2563eb; --chart-3:#0ea5e9; --chart-4:#10b981; --chart-5:#84cc16; }
+  [data-theme="4b"] .card { border: 2px solid var(--border); box-shadow: -8px 8px 0px rgba(0,0,0,0.15); transform: translate(4px, -4px); }
+
+  /* --- ROW 5 --- */
+  /* 5a (KEEPER): Architectural Subtle 2.5D Depth */
+  [data-theme="5a"] { --bg:#f8fafc; --surface:#ffffff; --text:#0f172a; --text-muted:#475569; --accent:#2563eb; --border:#e2e8f0; --radius:8px; --font-heading:-apple-system, sans-serif; --font-body:system-ui; --status-good:#059669; --chart-1:#2563eb; --chart-2:#6366f1; --chart-3:#a855f7; --chart-4:#d946ef; --chart-5:#f43f5e; }
+  [data-theme="5a"] .card { border: 1px solid var(--border); box-shadow: 2px 2px 0px #cbd5e1, 4px 4px 0px #94a3b8; }
+  
+  /* 5b (KEEPER): Mature Editorial Zine */
+  [data-theme="5b"] { --bg:#f4f1e1; --surface:#ffffff; --text:#1e293b; --text-muted:#64748b; --accent:#1e3a8a; --border:#1e293b; --radius:0px; --font-heading:'Courier New', monospace; --font-body:'Georgia', serif; --status-good:#15803d; --chart-1:#1e3a8a; --chart-2:#ea580c; --chart-3:#b45309; --chart-4:#15803d; --chart-5:#be123c; }
+  [data-theme="5b"] .card { border:1px solid var(--border); box-shadow: -4px 4px 0px rgba(30,58,138,0.2); position: relative; }
+  [data-theme="5b"] .card::before { content:''; position:absolute; top:-2px; left:-2px; width:8px; height:8px; background:var(--text); }
+  
+  /* 5c (KEEPER): Candy Minimal (Soft Red) */
+  [data-theme="5c"] { --bg:#FFF5F5; --surface:#ffffff; --text:#4c0519; --text-muted:#9f1239; --accent:#be123c; --border:#fda4af; --radius:12px; --font-heading:-apple-system, sans-serif; --font-body:-apple-system, sans-serif; --status-good:#e11d48; --chart-1:#be123c; --chart-2:#e11d48; --chart-3:#f43f5e; --chart-4:#fb7185; --chart-5:#fda4af; }
+  [data-theme="5c"] .card { border:1px solid var(--border); box-shadow:3px 3px 0px rgba(190,18,60,0.2); }
+
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--font-body); transition: all 0.3s ease; }
+  h1, h2 { font-family: var(--font-heading); margin: 0; font-weight: 600; letter-spacing: -0.5px; }
+  
+  .layout { display: grid; grid-template-columns: 240px 1fr; height: 100vh; }
+  .sidebar { border-right: 1px solid var(--border); padding: 32px 24px; display: flex; flex-direction: column; gap: 24px; background: var(--surface); z-index: 10; }
+  .main { padding: 48px; overflow-y: auto; overflow-x: hidden; }
+  
+  .card { background: var(--surface); padding: 32px; transition: box-shadow 0.2s ease, transform 0.2s ease; overflow: hidden; }
+  
+  /* Soft skeleton loading state */
+  .load-el.skeleton {
+    background-color: var(--skeleton-bg);
+    border-radius: 4px;
+    animation: delicate-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+  @keyframes delicate-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  .loader-text {
+    font-size: 13px; color: var(--text-muted); margin-bottom: 6px; font-weight: 500;
+    text-transform: uppercase; letter-spacing: 1px;
+    animation: fadePulse 2s infinite alternate;
+  }
+  @keyframes fadePulse { from { opacity: 0.4; } to { opacity: 1; } }
+  
+  /* Utilities */
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-bottom: 24px; }
+  .grid-2 { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; }
+  
+  /* Selection Grid */
+  .btn-group-grid {
+    position: fixed; bottom: 30px; right: 30px; display: flex; flex-direction: column; gap: 6px;
+    background: rgba(255,255,255,0.95); padding: 16px; border-radius: 12px;
+    border: 1px solid rgba(0,0,0,0.1); box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+    z-index: 100; backdrop-filter: blur(10px);
+  }
+  .btn-row { display: flex; align-items: center; gap: 6px; }
+  .row-label { 
+    width: 140px; font-size: 11px; font-weight: bold; text-transform: uppercase; 
+    color: #444; text-align: right; margin-right: 8px; font-family: system-ui;
+  }
+  .grid-btn { 
+    width: 36px; height: 36px; border-radius: 6px; border: 1px solid rgba(0,0,0,0.2); 
+    background: white; color: black; cursor: pointer; font-weight: bold; font-size: 12px; 
+    transition: all 0.15s; font-family: system-ui; display: flex; align-items: center; justify-content: center;
+  }
+  .grid-btn:hover { background: #f0f0f0; transform: scale(1.05); }
+  .grid-btn.active { background: black; color: white; border-color: black; }
+  
+  .theme-title { margin-bottom: 12px; font-size: 14px; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); font-weight: bold; }
+</style>
+</head>
+<body data-theme="1a">
+  <div class="layout">
+    <div class="sidebar">
+      <h2 style="font-size: 20px;">RevSight</h2>
+      <div style="display:flex; flex-direction:column; gap:16px; margin-top:24px;">
+        <div class="data-el" style="color:var(--text); font-weight:500;">Pipelines</div>
+        <div class="data-el" style="color:var(--text-muted)">Accounts</div>
+        <div class="data-el" style="color:var(--text-muted)">Forecast</div>
+      </div>
+    </div>
+    
+    <div class="main">
+      <div class="theme-title" id="theme-name">1a. Soft Neo-Brutalism</div>
+      <div style="display:flex; justify-content:space-between; margin-bottom: 40px; align-items: flex-end;">
+        <div>
+           <h1 id="page-title" style="font-size: 32px">Revenue Command</h1>
+           <p style="color:var(--text-muted); margin-top: 8px;">Q3 Enterprise Analysis</p>
+        </div>
+        <button onclick="toggleLoad()" style="padding: 12px 24px; font-weight: bold; font-family: var(--font-body); border-radius: var(--radius); background: var(--surface); color: var(--text); border: 1px solid var(--border); cursor:pointer; box-shadow: 2px 2px 0px rgba(0,0,0,0.1);">Re-run Cold Start</button>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <div style="color:var(--text-muted); font-size:13px; margin-bottom:12px; letter-spacing:1px; text-transform:uppercase;">Coverage</div>
+          <div class="data-el" style="font-size:36px; font-weight:bold; font-family:var(--font-heading)">4.2x</div>
+          <div class="load-el" style="display:none;">
+            <div class="loader-text">Computing SQL...</div>
+            <div class="skeleton" style="height:32px; width:70%"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div style="color:var(--text-muted); font-size:13px; margin-bottom:12px; letter-spacing:1px; text-transform:uppercase;">Win Rate</div>
+          <div class="data-el" style="font-size:36px; font-weight:bold; font-family:var(--font-heading)">28%</div>
+          <div class="load-el" style="display:none;">
+            <div class="loader-text">Analyzing deals...</div>
+            <div class="skeleton" style="height:32px; width:50%"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div style="color:var(--text-muted); font-size:13px; margin-bottom:12px; letter-spacing:1px; text-transform:uppercase;">Velocity</div>
+          <div class="data-el" style="font-size:36px; font-weight:bold; font-family:var(--font-heading)">62d</div>
+          <div class="load-el" style="display:none;">
+            <div class="loader-text">Awaiting data...</div>
+            <div class="skeleton" style="height:32px; width:60%"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div style="color:var(--text-muted); font-size:13px; margin-bottom:12px; letter-spacing:1px; text-transform:uppercase;">Confidence</div>
+          <div class="data-el" style="font-size:36px; font-weight:bold; font-family:var(--font-heading); color: var(--status-good)">High</div>
+          <div class="load-el" style="display:none;">
+            <div class="loader-text">Evaluating risk...</div>
+            <div class="skeleton" style="height:32px; width:80%"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card" style="min-height:300px">
+          <h2 style="font-size:18px; margin-bottom:32px">Stage Conversion</h2>
+          <div class="data-el" style="display:flex; align-items:flex-end; gap:6px; height:200px">
+            <div style="flex:1; background:var(--chart-1); height:100%;"></div>
+            <div style="flex:1; background:var(--chart-2); height:85%;"></div>
+            <div style="flex:1; background:var(--chart-3); height:60%;"></div>
+            <div style="flex:1; background:var(--chart-4); height:45%;"></div>
+            <div style="flex:1; background:var(--chart-5); height:30%;"></div>
+          </div>
+          <div class="load-el" style="display:none; height:200px; display:flex; flex-direction:column; justify-content:center; align-items:center;">
+             <div class="loader-text">Building funnel...</div>
+             <div class="skeleton" style="height:100px; width:100%; max-width:400px; margin-top:20px;"></div>
+          </div>
+        </div>
+
+        <div class="card" style="min-height:300px">
+          <h2 style="font-size:18px; margin-bottom:32px">Executive Summary</h2>
+          <div class="data-el" style="line-height:1.7; font-size: 15px; color: var(--text);">
+            <p style="margin-top:0">The pipeline shows strong coverage at 4.2x. Win rates are stable.</p>
+            <p>No immediate <span style="font-weight:bold; color:var(--accent);">risks</span> detected in Q3 Enterprise data. Forecast confidence is calculated as high.</p>
+          </div>
+          <div class="load-el" style="display:none; flex-direction:column; gap:16px;">
+             <div class="loader-text">Generating narrative...</div>
+            <div class="skeleton" style="height:16px; width:100%;"></div>
+            <div class="skeleton" style="height:16px; width:95%;"></div>
+            <div class="skeleton" style="height:16px; width:80%;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="btn-group-grid">
+    <div class="btn-row">
+      <div class="row-label">1. Brutalism / Flat</div>
+      <button class="grid-btn active" onclick="setTheme('1a', '1a. Soft Neo-Brutalism')">A</button>
+      <button class="grid-btn" onclick="setTheme('1c', '1c. Pastel Blue Brutalism')">C</button>
+    </div>
+    <div class="btn-row">
+      <div class="row-label">2. Typographical</div>
+      <button class="grid-btn" onclick="setTheme('2a', '2a. Advanced Typographic Grid')">A</button>
+      <button class="grid-btn" onclick="setTheme('2c', '2c. Pale Olive Editorial')">C</button>
+    </div>
+    <div class="btn-row">
+      <div class="row-label">3. 3D / Blob</div>
+      <button class="grid-btn" onclick="setTheme('3a', '3a. Vibrant Soft Float')">A</button>
+      <button class="grid-btn" onclick="setTheme('3c', '3c. Warm Mute')">C</button>
+    </div>
+    <div class="btn-row">
+      <div class="row-label">4. Split / 2.5D</div>
+      <button class="grid-btn" onclick="setTheme('4a', '4a. Editorial Crisp')">A</button>
+      <button class="grid-btn" onclick="setTheme('4b', '4b. 2.5D / Isometric Offset')">B</button>
+    </div>
+    <div class="btn-row">
+      <div class="row-label">5. Avant-Garde</div>
+      <button class="grid-btn" onclick="setTheme('5a', '5a. Architectural Subtle 2.5D Depth')">A</button>
+      <button class="grid-btn" onclick="setTheme('5b', '5b. Mature Editorial Zine')">B</button>
+      <button class="grid-btn" onclick="setTheme('5c', '5c. Candy Minimal')">C</button>
+    </div>
+  </div>
+
+  <script>
+    let loading = true;
+    function renderState() {
+      document.querySelectorAll('.data-el').forEach(el => el.style.display = loading ? 'none' : 'block');
+      document.querySelectorAll('.load-el').forEach(el => el.style.display = loading ? 'block' : 'none');
+      
+      const chart = document.querySelector('.grid-2 .card:nth-child(1) .data-el');
+      if (chart) chart.style.display = loading ? 'none' : 'flex';
+      const loadChart = document.querySelector('.grid-2 .card:nth-child(1) .load-el');
+      if (loadChart) loadChart.style.display = loading ? 'flex' : 'none';
+      
+      const summaryLoad = document.querySelector('.grid-2 .card:nth-child(2) .load-el');
+      if (summaryLoad) summaryLoad.style.display = loading ? 'flex' : 'none';
+    }
+
+    renderState(); 
+
+    setTimeout(() => {
+      loading = false;
+      renderState();
+    }, 3000);
+
+    function toggleLoad() {
+      loading = true;
+      renderState();
+      clearTimeout(window.loaderTimeout);
+      window.loaderTimeout = setTimeout(() => {
+        loading = false;
+        renderState();
+      }, 3000);
+    }
+
+    function setTheme(theme, title) {
+      document.body.setAttribute('data-theme', theme);
+      document.getElementById('theme-name').innerText = title;
+      
+      document.querySelectorAll('.grid-btn').forEach(b => b.classList.remove('active'));
+      const activeBtnMatch = Array.from(document.querySelectorAll('.grid-btn'))
+          .find(el => el.getAttribute('onclick') && el.getAttribute('onclick').includes("'" + theme + "'"));
+      if (activeBtnMatch) activeBtnMatch.classList.add('active');
+    }
+  </script>
+</body>
+</html>

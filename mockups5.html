@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  /* Base defaults */
+  :root {
+    --bg: #ffffff; --surface: #ffffff; --text: #000000; --text-muted: #666666;
+    --accent: #000000; --border: #000000; --radius: 0px; --font-heading: system-ui; --font-body: system-ui;
+    --skeleton-bg: rgba(0,0,0,0.04);
+  }
+  
+  /* --- 1. Soft Neo-Brutalism --- */
+  /* 1a */ [data-theme="1a"] { --bg:#FAF8F5; --surface:#fff; --text:#1a1a1a; --text-muted:#737373; --accent:#e11d48; --border:#1a1a1a; --radius:4px; --font-heading:'Helvetica Neue', sans-serif; --font-body:'Helvetica Neue', sans-serif; }
+  [data-theme="1a"] .card { border:1px solid var(--border); box-shadow:2px 2px 0px var(--border); }
+  
+  /* 1b: Monochromatic / Thicker borders */
+  [data-theme="1b"] { --bg:#ffffff; --surface:#ffffff; --text:#111111; --text-muted:#666666; --accent:#000000; --border:#000000; --radius:0px; --font-heading:'Oswald', system-ui; --font-body:system-ui; }
+  [data-theme="1b"] .card { border:2px solid var(--border); box-shadow:4px 4px 0px var(--border); }
+  
+  /* 1c: Pastel Blue Brutalism */
+  [data-theme="1c"] { --bg:#F0F4F8; --surface:#ffffff; --text:#2c3e50; --text-muted:#7f8c8d; --accent:#e74c3c; --border:#2c3e50; --radius:4px; --font-heading:'Trebuchet MS', sans-serif; --font-body:system-ui; }
+  [data-theme="1c"] .card { border:1px solid var(--border); box-shadow:3px 3px 0px rgba(44,62,80,0.3); }
+
+  /* --- 2. Warm Editorial + Soft Shadows --- */
+  /* 2a */ [data-theme="2a"] { --bg:#Fbf9f6; --surface:#fff; --text:#2c2a26; --text-muted:#8c8881; --accent:#bd8e5e; --border:#eae6e1; --radius:12px; --font-heading:'Georgia', serif; --font-body:'Arial', sans-serif; }
+  [data-theme="2a"] .card { border:1px solid var(--border); box-shadow:0 8px 24px -10px rgba(44,42,38,0.15); }
+  
+  /* 2b: High-Contrast Editorial */
+  [data-theme="2b"] { --bg:#ffffff; --surface:#ffffff; --text:#111827; --text-muted:#6b7280; --accent:#7f1d1d; --border:#f3f4f6; --radius:8px; --font-heading:'Georgia', serif; --font-body:'Georgia', serif; }
+  [data-theme="2b"] .card { border:none; box-shadow:0 10px 25px rgba(0,0,0,0.06); }
+  
+  /* 2c: Pale Olive Editorial */
+  [data-theme="2c"] { --bg:#F5F5F0; --surface:#ffffff; --text:#142918; --text-muted:#6B7A6E; --accent:#166534; --border:#e9e9e1; --radius:16px; --font-heading:'Palatino', serif; --font-body:-apple-system, sans-serif; }
+  [data-theme="2c"] .card { border:1px solid var(--border); box-shadow:0 12px 30px -10px rgba(22,101,52,0.1); }
+
+  /* --- 3. Structured Mute --- */
+  /* 3a */ [data-theme="3a"] { --bg:#f4f3f0; --surface:#fff; --text:#171717; --text-muted:#737373; --accent:#0f766e; --border:#d4d4d4; --radius:8px; --font-heading:'Inter', system-ui; --font-body:'Inter', system-ui; }
+  [data-theme="3a"] .card { border:1px solid var(--border); box-shadow:3px 3px 0px rgba(0,0,0,0.06); }
+  
+  /* 3b: Blue Mute */
+  [data-theme="3b"] { --bg:#F0F4F8; --surface:#ffffff; --text:#0f172a; --text-muted:#64748b; --accent:#1d4ed8; --border:#cbd5e1; --radius:8px; --font-heading:-apple-system, sans-serif; --font-body:-apple-system, sans-serif; }
+  [data-theme="3b"] .card { border:1px solid var(--border); box-shadow:4px 4px 0px rgba(29,78,216,0.08); }
+  
+  /* 3c: Warm Mute */
+  [data-theme="3c"] { --bg:#FAF5F0; --surface:#ffffff; --text:#431407; --text-muted:#78350f; --accent:#c2410c; --border:#fdba74; --radius:6px; --font-heading:system-ui; --font-body:system-ui; }
+  [data-theme="3c"] .card { border:1px solid var(--border); box-shadow:3px 3px 0px rgba(194,65,12,0.1); }
+
+  /* --- 4. Editorial Crisp --- */
+  /* 4a */ [data-theme="4a"] { --bg:#F5EFEB; --surface:#fff; --text:#2f2a24; --text-muted:#968c83; --accent:#c2410c; --border:transparent; --radius:0px; --font-heading:'Times New Roman', serif; --font-body:system-ui; }
+  [data-theme="4a"] .card { box-shadow:0 4px 12px rgba(47,42,36,0.08); border-top:3px solid var(--text); }
+  
+  /* 4b: Double-lined Newspaper */
+  [data-theme="4b"] { --bg:#F3F4F6; --surface:#ffffff; --text:#111827; --text-muted:#6b7280; --accent:#0369a1; --border:transparent; --radius:0px; --font-heading:'Garamond', serif; --font-body:'Arial', sans-serif; }
+  [data-theme="4b"] .card { box-shadow:0 2px 8px rgba(0,0,0,0.05); border-top:4px double var(--text); }
+  
+  /* 4c: Side-band Accent */
+  [data-theme="4c"] { --bg:#F9FAFB; --surface:#ffffff; --text:#1f2937; --text-muted:#9ca3af; --accent:#b91c1c; --border:transparent; --radius:0px; --font-heading:'Georgia', serif; --font-body:system-ui; }
+  [data-theme="4c"] .card { box-shadow:0 5px 15px rgba(0,0,0,0.03); border-left:4px solid var(--accent); }
+
+  /* --- 5. Minimal Playful --- */
+  /* 5a */ [data-theme="5a"] { --bg:#FDFBF7; --surface:#fff; --text:#101010; --text-muted:#666666; --accent:#2563eb; --border:#101010; --radius:16px; --font-heading:'Arial', sans-serif; --font-body:'Arial', sans-serif; }
+  [data-theme="5a"] .card { border:1.5px solid var(--border); box-shadow:3px 3px 0px var(--border); }
+  
+  /* 5b: Max Rounded */
+  [data-theme="5b"] { --bg:#F8FAFC; --surface:#ffffff; --text:#020617; --text-muted:#64748b; --accent:#4f46e5; --border:#cbd5e1; --radius:24px; --font-heading:system-ui; --font-body:system-ui; }
+  [data-theme="5b"] .card { border:2px solid var(--border); box-shadow:4px 4px 0px var(--border); }
+  
+  /* 5c: Candy Minimal */
+  [data-theme="5c"] { --bg:#FFF5F5; --surface:#ffffff; --text:#4c0519; --text-muted:#9f1239; --accent:#be123c; --border:#fda4af; --radius:12px; --font-heading:-apple-system, sans-serif; --font-body:-apple-system, sans-serif; }
+  [data-theme="5c"] .card { border:1px solid var(--border); box-shadow:3px 3px 0px rgba(190,18,60,0.2); }
+
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--font-body); transition: all 0.3s ease; }
+  h1, h2 { font-family: var(--font-heading); margin: 0; font-weight: 600; letter-spacing: -0.5px; }
+  
+  .layout { display: grid; grid-template-columns: 240px 1fr; height: 100vh; }
+  .sidebar { border-right: 1px solid var(--border); padding: 32px 24px; display: flex; flex-direction: column; gap: 24px; background: var(--surface); z-index: 10; }
+  .main { padding: 48px; overflow-y: auto; }
+  
+  .card { background: var(--surface); padding: 32px; transition: box-shadow 0.2s ease, transform 0.2s ease; }
+  
+  /* Soft skeleton loading state */
+  .load-el.skeleton {
+    background-color: var(--skeleton-bg);
+    border-radius: 4px;
+    animation: delicate-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+  @keyframes delicate-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  .loader-text {
+    font-size: 13px; color: var(--text-muted); margin-bottom: 6px; font-weight: 500;
+    text-transform: uppercase; letter-spacing: 1px;
+    animation: fadePulse 2s infinite alternate;
+  }
+  @keyframes fadePulse { from { opacity: 0.4; } to { opacity: 1; } }
+  
+  /* Utilities */
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-bottom: 24px; }
+  .grid-2 { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; }
+  
+  /* Selection Grid */
+  .btn-group-grid {
+    position: fixed; bottom: 30px; right: 30px; display: flex; flex-direction: column; gap: 6px;
+    background: rgba(255,255,255,0.95); padding: 16px; border-radius: 12px;
+    border: 1px solid rgba(0,0,0,0.1); box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+    z-index: 100; backdrop-filter: blur(10px);
+  }
+  .btn-row { display: flex; align-items: center; gap: 6px; }
+  .row-label { 
+    width: 140px; font-size: 11px; font-weight: bold; text-transform: uppercase; 
+    color: #444; text-align: right; margin-right: 8px; font-family: system-ui;
+  }
+  .grid-btn { 
+    width: 36px; height: 36px; border-radius: 6px; border: 1px solid rgba(0,0,0,0.2); 
+    background: white; color: black; cursor: pointer; font-weight: bold; font-size: 12px; 
+    transition: all 0.15s; font-family: system-ui; display: flex; align-items: center; justify-content: center;
+  }
+  .grid-btn:hover { background: #f0f0f0; transform: scale(1.05); }
+  .grid-btn.active { background: black; color: white; border-color: black; }
+  
+  .theme-title { margin-bottom: 12px; font-size: 14px; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); font-weight: bold; }
+</style>
+</head>
+<body data-theme="1a">
+  <div class="layout">
+    <div class="sidebar">
+      <h2 style="font-size: 20px;">RevSight</h2>
+      <div style="display:flex; flex-direction:column; gap:16px; margin-top:24px;">
+        <div class="data-el" style="color:var(--text); font-weight:500;">Pipelines</div>
+        <div class="data-el" style="color:var(--text-muted)">Accounts</div>
+        <div class="data-el" style="color:var(--text-muted)">Forecast</div>
+      </div>
+    </div>
+    
+    <div class="main">
+      <div class="theme-title" id="theme-name">1a. Soft Neo-Brutalism (Original)</div>
+      <div style="display:flex; justify-content:space-between; margin-bottom: 40px; align-items: flex-end;">
+        <div>
+           <h1 id="page-title" style="font-size: 32px">Revenue Command</h1>
+           <p style="color:var(--text-muted); margin-top: 8px;">Q3 Enterprise Analysis</p>
+        </div>
+        <button onclick="toggleLoad()" style="padding: 12px 24px; font-weight: bold; font-family: var(--font-body); border-radius: var(--radius); background: var(--surface); color: var(--text); border: 1px solid var(--border); cursor:pointer; box-shadow: 2px 2px 0px rgba(0,0,0,0.1);">Re-run Cold Start</button>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <div style="color:var(--text-muted); font-size:13px; margin-bottom:12px; letter-spacing:1px; text-transform:uppercase;">Coverage</div>
+          <div class="data-el" style="font-size:36px; font-weight:bold; font-family:var(--font-heading)">4.2x</div>
+          <div class="load-el" style="display:none;">
+            <div class="loader-text">Computing SQL...</div>
+            <div class="skeleton" style="height:32px; width:70%"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div style="color:var(--text-muted); font-size:13px; margin-bottom:12px; letter-spacing:1px; text-transform:uppercase;">Win Rate</div>
+          <div class="data-el" style="font-size:36px; font-weight:bold; font-family:var(--font-heading)">28%</div>
+          <div class="load-el" style="display:none;">
+            <div class="loader-text">Analyzing deals...</div>
+            <div class="skeleton" style="height:32px; width:50%"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div style="color:var(--text-muted); font-size:13px; margin-bottom:12px; letter-spacing:1px; text-transform:uppercase;">Velocity</div>
+          <div class="data-el" style="font-size:36px; font-weight:bold; font-family:var(--font-heading)">62d</div>
+          <div class="load-el" style="display:none;">
+            <div class="loader-text">Awaiting data...</div>
+            <div class="skeleton" style="height:32px; width:60%"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div style="color:var(--text-muted); font-size:13px; margin-bottom:12px; letter-spacing:1px; text-transform:uppercase;">Confidence</div>
+          <div class="data-el" style="font-size:36px; font-weight:bold; font-family:var(--font-heading); color: var(--accent)">High</div>
+          <div class="load-el" style="display:none;">
+            <div class="loader-text">Evaluating risk...</div>
+            <div class="skeleton" style="height:32px; width:80%"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card" style="min-height:300px">
+          <h2 style="font-size:18px; margin-bottom:32px">Stage Conversion</h2>
+          <div class="data-el" style="display:flex; align-items:flex-end; gap:6px; height:200px">
+            <div style="flex:1; background:var(--text); height:100%; opacity:1.0;"></div>
+            <div style="flex:1; background:var(--text); height:85%; opacity:0.8;"></div>
+            <div style="flex:1; background:var(--text); height:60%; opacity:0.6;"></div>
+            <div style="flex:1; background:var(--text); height:45%; opacity:0.4;"></div>
+            <div style="flex:1; background:var(--text); height:30%; opacity:0.2;"></div>
+          </div>
+          <div class="load-el" style="display:none; height:200px; display:flex; flex-direction:column; justify-content:center; align-items:center;">
+             <div class="loader-text">Building funnel...</div>
+             <div class="skeleton" style="height:100px; width:100%; max-width:400px; margin-top:20px;"></div>
+          </div>
+        </div>
+
+        <div class="card" style="min-height:300px">
+          <h2 style="font-size:18px; margin-bottom:32px">Executive Summary</h2>
+          <div class="data-el" style="line-height:1.7; font-size: 15px; color: var(--text);">
+            <p style="margin-top:0">The pipeline shows strong coverage at 4.2x. Win rates are stable.</p>
+            <p>No immediate risks detected in Q3 Enterprise data. Forecast confidence is calculated as high.</p>
+          </div>
+          <div class="load-el" style="display:none; flex-direction:column; gap:16px;">
+             <div class="loader-text">Generating narrative...</div>
+            <div class="skeleton" style="height:16px; width:100%;"></div>
+            <div class="skeleton" style="height:16px; width:95%;"></div>
+            <div class="skeleton" style="height:16px; width:80%;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="btn-group-grid">
+    <div class="btn-row">
+      <div class="row-label">1. Soft Brutal</div>
+      <button class="grid-btn active" onclick="setTheme('1a', '1a. Soft Neo-Brutalism (Original)')">A</button>
+      <button class="grid-btn" onclick="setTheme('1b', '1b. Soft Brutal (Mono / Thick)')">B</button>
+      <button class="grid-btn" onclick="setTheme('1c', '1c. Soft Brutal (Pastel Blue Shadow)')">C</button>
+    </div>
+    <div class="btn-row">
+      <div class="row-label">2. Editorial Shadows</div>
+      <button class="grid-btn" onclick="setTheme('2a', '2a. Warm Editorial (Original)')">A</button>
+      <button class="grid-btn" onclick="setTheme('2b', '2b. High-Contrast Editorial')">B</button>
+      <button class="grid-btn" onclick="setTheme('2c', '2c. Pale Olive Editorial')">C</button>
+    </div>
+    <div class="btn-row">
+      <div class="row-label">3. Structured Mute</div>
+      <button class="grid-btn" onclick="setTheme('3a', '3a. Structured Mute (Original)')">A</button>
+      <button class="grid-btn" onclick="setTheme('3b', '3b. Blue Mute')">B</button>
+      <button class="grid-btn" onclick="setTheme('3c', '3c. Warm Mute')">C</button>
+    </div>
+    <div class="btn-row">
+      <div class="row-label">4. Editorial Crisp</div>
+      <button class="grid-btn" onclick="setTheme('4a', '4a. Editorial Crisp (Floating Original)')">A</button>
+      <button class="grid-btn" onclick="setTheme('4b', '4b. Double-Line Newspaper')">B</button>
+      <button class="grid-btn" onclick="setTheme('4c', '4c. Left-Band Accent')">C</button>
+    </div>
+    <div class="btn-row">
+      <div class="row-label">5. Minimal Playful</div>
+      <button class="grid-btn" onclick="setTheme('5a', '5a. Minimal Playful (Original)')">A</button>
+      <button class="grid-btn" onclick="setTheme('5b', '5b. Max Rounded Playful')">B</button>
+      <button class="grid-btn" onclick="setTheme('5c', '5c. Candy Minimal (Soft Red)')">C</button>
+    </div>
+  </div>
+
+  <script>
+    let loading = true;
+    function renderState() {
+      document.querySelectorAll('.data-el').forEach(el => el.style.display = loading ? 'none' : 'block');
+      document.querySelectorAll('.load-el').forEach(el => el.style.display = loading ? 'block' : 'none');
+      
+      const chart = document.querySelector('.grid-2 .card:nth-child(1) .data-el');
+      if (chart) chart.style.display = loading ? 'none' : 'flex';
+      const loadChart = document.querySelector('.grid-2 .card:nth-child(1) .load-el');
+      if (loadChart) loadChart.style.display = loading ? 'flex' : 'none';
+      
+      const summaryLoad = document.querySelector('.grid-2 .card:nth-child(2) .load-el');
+      if (summaryLoad) summaryLoad.style.display = loading ? 'flex' : 'none';
+    }
+
+    renderState(); 
+
+    setTimeout(() => {
+      loading = false;
+      renderState();
+    }, 3000);
+
+    function toggleLoad() {
+      loading = true;
+      renderState();
+      clearTimeout(window.loaderTimeout);
+      window.loaderTimeout = setTimeout(() => {
+        loading = false;
+        renderState();
+      }, 3000);
+    }
+
+    function setTheme(theme, title) {
+      document.body.setAttribute('data-theme', theme);
+      document.getElementById('theme-name').innerText = title;
+      
+      // Update active button
+      document.querySelectorAll('.grid-btn').forEach(b => b.classList.remove('active'));
+      const activeBtnMatch = Array.from(document.querySelectorAll('.grid-btn'))
+          .find(el => el.getAttribute('onclick') && el.getAttribute('onclick').includes("'" + theme + "'"));
+      if (activeBtnMatch) activeBtnMatch.classList.add('active');
+    }
+  </script>
+</body>
+</html>

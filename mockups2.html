@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  /* Base defaults */
+  :root {
+    --bg: #f8f9fa; --surface: #ffffff; --text: #1a1b1e; --text-muted: #868e96;
+    --accent: #228be6; --border: #e9ecef; --radius: 8px; --font-heading: system-ui; --font-body: system-ui;
+  }
+  
+  /* 1. Swiss / Editorial (High contrast, clean lines, Helvetica) */
+  [data-theme="swiss"] {
+    --bg: #ffffff; --surface: #ffffff; --text: #000000; --text-muted: #666666;
+    --accent: #d92121; --border: #000000; --radius: 0px; 
+    --font-heading: 'Helvetica Neue', Helvetica, Arial, sans-serif; --font-body: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  }
+  
+  /* 2. Cinematic Slate (Deep navy/slate dark mode, highly professional) */
+  [data-theme="cinematic"] {
+    --bg: #0b1120; --surface: #111827; --text: #f9fafb; --text-muted: #94a3b8;
+    --accent: #38bdf8; --border: #1e293b; --radius: 6px;
+    --font-heading: 'Inter', system-ui; --font-body: 'Inter', system-ui;
+  }
+
+  /* 3. Soft Minimalism (Elegant, warm paper whites, serif headings for an editorial/magazine feel) */
+  [data-theme="soft"] {
+    --bg: #faf9f6; --surface: #ffffff; --text: #2c2a25; --text-muted: #8c8881;
+    --accent: #bd8e5e; --border: #e6e4df; --radius: 12px;
+    --font-heading: 'Georgia', serif; --font-body: 'Avenir', system-ui;
+  }
+
+  /* 4. Glass/Spatial Pro (Mature frosted glass, dark mode, no neon/children aesthetics, very Apple-like) */
+  [data-theme="spatial"] {
+    --bg: #000000; --surface: rgba(30, 30, 30, 0.6); --text: #ffffff; --text-muted: #a1a1aa;
+    --accent: #818cf8; --border: rgba(255, 255, 255, 0.1); --radius: 16px;
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    --font-heading: system-ui; --font-body: system-ui;
+  }
+
+  /* 5. Refined Neo-Brutalism (Toned down from earlier: crisp borders, muted beige/blue without being overwhelming) */
+  [data-theme="brutalist"] {
+    --bg: #f4f0ec; --surface: #ffffff; --text: #101010; --text-muted: #555555;
+    --accent: #2563eb; --border: #101010; --radius: 4px;
+    --font-heading: 'Space Grotesk', system-ui; --font-body: 'Space Grotesk', system-ui;
+  }
+
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--font-body); transition: all 0.3s ease; }
+  h1, h2 { font-family: var(--font-heading); margin: 0; font-weight: 600; letter-spacing: -0.5px; }
+  
+  .layout { display: grid; grid-template-columns: 240px 1fr; height: 100vh; }
+  .sidebar { border-right: 1px solid var(--border); padding: 32px 24px; display: flex; flex-direction: column; gap: 24px; background: var(--surface); }
+  .main { padding: 48px; overflow-y: auto; }
+  
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 32px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+  [data-theme="brutalist"] .card { box-shadow: 4px 4px 0px var(--border); margin-bottom: 4px; }
+  
+  /* Advanced Skeleton Loader matching the aesthetic */
+  .skeleton { background: linear-gradient(90deg, transparent 0%, rgba(150,150,150,0.1) 50%, transparent 100%); background-size: 200% 100%; animation: shimmer 1.5s infinite linear; border-radius: 4px; background-color: var(--border); opacity: 0.7; }
+  @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+  
+  /* Utilities */
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-bottom: 24px; }
+  .grid-2 { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; }
+  
+  .btn-group { position: fixed; bottom: 30px; right: 30px; display: flex; gap: 8px; background: var(--bg); padding: 12px; border-radius: 50px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.1); z-index: 100; }
+  .btn { width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--border); background: var(--surface); color: var(--text); cursor: pointer; font-weight: bold; transition: all 0.2s; font-family: var(--font-body); }
+  .btn:hover { transform: translateY(-2px); }
+  .btn.active { background: var(--text); color: var(--bg); border-color: var(--text); }
+  
+  .theme-title { margin-bottom: 12px; font-size: 14px; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); font-weight: bold; }
+</style>
+</head>
+<body data-theme="swiss">
+  <div class="layout">
+    <div class="sidebar">
+      <h2 style="font-size: 20px;">RevSight</h2>
+      <div style="display:flex; flex-direction:column; gap:16px; margin-top:24px;">
+        <div class="data-el" style="color:var(--text); font-weight:500;">Pipelines</div>
+        <div class="data-el" style="color:var(--text-muted)">Accounts</div>
+        <div class="data-el" style="color:var(--text-muted)">Forecast</div>
+      </div>
+    </div>
+    
+    <div class="main">
+      <div class="theme-title" id="theme-name">1. Swiss Editorial</div>
+      <div style="display:flex; justify-content:space-between; margin-bottom: 40px; align-items: flex-end;">
+        <div>
+           <h1 id="page-title" style="font-size: 32px">Revenue Command</h1>
+           <p style="color:var(--text-muted); margin-top: 8px;">Q3 Enterprise Analysis</p>
+        </div>
+        <button onclick="toggleLoad()" style="padding: 12px 24px; font-weight: 500; font-family: var(--font-body); border-radius: var(--radius); background: var(--accent); color: var(--bg); border: 1px solid var(--border); cursor:pointer;">Simulate Cold Start</button>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <div style="color:var(--text-muted); font-size:14px; margin-bottom:12px; letter-spacing:0.5px; text-transform:uppercase;">Coverage</div>
+          <div class="data-el" style="font-size:36px; font-weight:bold; font-family:var(--font-heading)">4.2x</div>
+          <div class="load-el skeleton" style="height:40px; width:60%"></div>
+        </div>
+        <div class="card">
+          <div style="color:var(--text-muted); font-size:14px; margin-bottom:12px; letter-spacing:0.5px; text-transform:uppercase;">Win Rate</div>
+          <div class="data-el" style="font-size:36px; font-weight:bold; font-family:var(--font-heading)">28%</div>
+          <div class="load-el skeleton" style="height:40px; width:60%"></div>
+        </div>
+        <div class="card">
+          <div style="color:var(--text-muted); font-size:14px; margin-bottom:12px; letter-spacing:0.5px; text-transform:uppercase;">Velocity</div>
+          <div class="data-el" style="font-size:36px; font-weight:bold; font-family:var(--font-heading)">62d</div>
+          <div class="load-el skeleton" style="height:40px; width:60%"></div>
+        </div>
+        <div class="card">
+          <div style="color:var(--text-muted); font-size:14px; margin-bottom:12px; letter-spacing:0.5px; text-transform:uppercase;">Confidence</div>
+          <div class="data-el" style="font-size:36px; font-weight:bold; font-family:var(--font-heading); color: var(--accent)">High</div>
+          <div class="load-el skeleton" style="height:40px; width:60%"></div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card" style="min-height:300px">
+          <h2 style="font-size:18px; margin-bottom:32px">Stage Conversion</h2>
+          <div class="data-el" style="display:flex; align-items:flex-end; gap:2px; height:200px">
+            <div style="flex:1; background:var(--accent); height:100%; opacity:1.0;"></div>
+            <div style="flex:1; background:var(--accent); height:85%; opacity:0.8;"></div>
+            <div style="flex:1; background:var(--accent); height:60%; opacity:0.6;"></div>
+            <div style="flex:1; background:var(--accent); height:45%; opacity:0.4;"></div>
+            <div style="flex:1; background:var(--accent); height:30%; opacity:0.2;"></div>
+          </div>
+          <div class="load-el skeleton" style="height:200px; width:100%"></div>
+        </div>
+
+        <div class="card" style="min-height:300px">
+          <h2 style="font-size:18px; margin-bottom:32px">AI Executive Summary</h2>
+          <div class="data-el" style="line-height:1.7; font-size: 15px; color: var(--text);">
+            <p style="margin-top:0">The pipeline shows strong coverage at 4.2x. Win rates are stable.</p>
+            <p>No immediate risks detected in Q3 Enterprise data. Forecast confidence is calculated as high.</p>
+          </div>
+          <div class="load-el" style="display:flex; flex-direction:column; gap:12px">
+            <div class="skeleton" style="height:12px; width:100%;"></div>
+            <div class="skeleton" style="height:12px; width:95%;"></div>
+            <div class="skeleton" style="height:12px; width:80%;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="btn-group">
+    <button class="btn active" onclick="setTheme('swiss', 1, '1. Swiss Editorial')">1</button>
+    <button class="btn" onclick="setTheme('cinematic', 2, '2. Cinematic Slate')">2</button>
+    <button class="btn" onclick="setTheme('soft', 3, '3. Soft Minimalism')">3</button>
+    <button class="btn" onclick="setTheme('spatial', 4, '4. Glass/Spatial Pro')">4</button>
+    <button class="btn" onclick="setTheme('brutalist', 5, '5. Refined Neo-Brutalism')">5</button>
+  </div>
+
+  <script>
+    let loading = true;
+    function toggleLoad() {
+      loading = !loading;
+      document.querySelectorAll('.data-el').forEach(el => el.style.display = loading ? 'none' : 'flex');
+      document.querySelectorAll('.load-el').forEach(el => el.style.display = loading ? 'block' : 'none');
+      // Fix for text content
+      document.querySelectorAll('.card .data-el').forEach(el => { if(!el.style.display) return; if(el.parentElement.querySelector('.load-el')) el.style.display = loading ? 'none' : 'block'; });
+      // Chart fix
+      document.querySelector('.grid-2 .card:nth-child(1) .data-el').style.display = loading ? 'none' : 'flex';
+      
+      clearTimeout(window.loadTimer);
+      if(loading) {
+        window.loadTimer = setTimeout(toggleLoad, 3000);
+      }
+    }
+    toggleLoad(); // init state starts loading
+
+    function setTheme(theme, idx, title) {
+      document.body.setAttribute('data-theme', theme);
+      document.getElementById('theme-name').innerText = title;
+      document.querySelectorAll('.btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.btn')[idx-1].classList.add('active');
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>RevSight Mockups</title>
+    <style>
+        body, html { margin: 0; padding: 0; height: 100%; font-family: system-ui, sans-serif; background: #000; overflow: hidden; }
+        .mockup {
+            width: 100%; height: 100%;
+            background-size: contain; background-position: center; background-repeat: no-repeat;
+            position: absolute; top: 0; left: 0;
+            opacity: 0; transition: opacity 0.5s ease-in-out;
+            pointer-events: none;
+        }
+        .mockup.active { opacity: 1; pointer-events: auto; }
+        .controls {
+            position: fixed; bottom: 30px; right: 30px;
+            display: flex; gap: 10px; z-index: 100;
+            background: rgba(0,0,0,0.5); padding: 10px; border-radius: 50px; backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .btn {
+            width: 50px; height: 50px; border-radius: 25px; border: 2px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.1); color: white;
+            font-size: 18px; font-weight: bold; cursor: pointer;
+            transition: all 0.2s; display: flex; align-items: center; justify-content: center;
+        }
+        .btn:hover { background: rgba(255,255,255,0.3); transform: scale(1.1); }
+        .btn.active { background: #3b82f6; border-color: #60a5fa; box-shadow: 0 0 15px rgba(59,130,246,0.6); }
+        
+        .title { position: fixed; top: 30px; left: 30px; color: white; background: rgba(0,0,0,0.7); padding: 15px 25px; border-radius: 12px; backdrop-filter: blur(10px); opacity: 0; transition: opacity 0.5s; z-index: 100; border: 1px solid rgba(255,255,255,0.1); }
+        .title.active { opacity: 1; }
+        .title h2 { margin: 0 0 5px 0; font-size: 24px; }
+        .title p { margin: 0; opacity: 0.8; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <!-- Theme 1 -->
+    <div id="m1" class="mockup active" style="background-image: url('file:///C:/Users/Prave/.gemini/antigravity/brain/626b320d-3d71-42e8-a6e8-7fa20129a816/sleek_minimalist_dark_1775214146511.png')"></div>
+    <div id="t1" class="title active"><h2>1. Sleek Minimalist</h2><p>Dark mode, subtle green accents, Apple-like precision.</p></div>
+
+    <!-- Theme 2 -->
+    <div id="m2" class="mockup" style="background-image: url('file:///C:/Users/Prave/.gemini/antigravity/brain/626b320d-3d71-42e8-a6e8-7fa20129a816/glassmorphism_aurora_1775214162834.png')"></div>
+    <div id="t2" class="title"><h2>2. Glassmorphism</h2><p>Frosted glass panels, colorful aurora background.</p></div>
+
+    <!-- Theme 3 -->
+    <div id="m3" class="mockup" style="background-image: url('file:///C:/Users/Prave/.gemini/antigravity/brain/626b320d-3d71-42e8-a6e8-7fa20129a816/premium_light_mode_1775214179359.png')"></div>
+    <div id="t3" class="title"><h2>3. Premium Light</h2><p>Clean, structured data-grid, high contrast.</p></div>
+
+    <!-- Theme 4 -->
+    <div id="m4" class="mockup" style="background-image: url('file:///C:/Users/Prave/.gemini/antigravity/brain/626b320d-3d71-42e8-a6e8-7fa20129a816/cyberpunk_terminal_1775214199011.png')"></div>
+    <div id="t4" class="title"><h2>4. Cyberpunk</h2><p>Terminal aesthetic, glowing neon streams.</p></div>
+
+    <!-- Theme 5 -->
+    <div id="m5" class="mockup" style="background-image: url('file:///C:/Users/Prave/.gemini/antigravity/brain/626b320d-3d71-42e8-a6e8-7fa20129a816/neo_brutalism_dark_1775214217281.png')"></div>
+    <div id="t5" class="title"><h2>5. Neo-Brutalism</h2><p>High-contrast, stark typography, blocky styling.</p></div>
+
+    <!-- Controls -->
+    <div class="controls">
+        <button class="btn active" onclick="show(1)">1</button>
+        <button class="btn" onclick="show(2)">2</button>
+        <button class="btn" onclick="show(3)">3</button>
+        <button class="btn" onclick="show(4)">4</button>
+        <button class="btn" onclick="show(5)">5</button>
+    </div>
+
+    <script>
+        function show(index) {
+            document.querySelectorAll('.mockup').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.btn').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.title').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById('m' + index).classList.add('active');
+            document.getElementById('t' + index).classList.add('active');
+            document.querySelectorAll('.btn')[index-1].classList.add('active');
+        }
+    </script>
+</body>
+</html>

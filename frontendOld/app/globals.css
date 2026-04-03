@@ -1,0 +1,131 @@
+@import "tailwindcss";
+
+@theme {
+  /* Mapping Core TailWind Classes to our hex variables so bg-*, text-*, border-* works natively */
+  --color-background: var(--bg);
+  --color-foreground: var(--text-main);
+  
+  --color-card: var(--surface);
+  --color-card-foreground: var(--text-main);
+  
+  --color-popover: var(--surface);
+  --color-popover-foreground: var(--text-main);
+  
+  --color-primary: var(--accent);
+  --color-primary-foreground: #ffffff;
+  
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--text-main);
+  
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--text-muted);
+  
+  --color-destructive: var(--chart-4);
+  --color-destructive-foreground: #ffffff;
+
+  --color-border: var(--border);
+  --color-input: var(--border);
+  --color-ring: var(--accent);
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-lora), "Georgia", serif;
+  --shadow-fusion: 3px 3px 0px #2E2E2E;
+}
+
+:root {
+  /* Fusion 5 Dark Tokens */
+  --bg: #0C0C0C;
+  --surface: #171717;
+  --text-main: #EDEDED;
+  --text-muted: #A3A3A3;
+  --accent: #3B82F6; /* Electric Blue for sharp high-end tech contrast */
+  --border: #2E2E2E;
+  --secondary: #262626;
+  --muted: #1A1A1A;
+  
+  /* Shared Charts */
+  --status-good: #10B981;
+  --chart-1: #3B82F6;
+  --chart-2: #8B5CF6;
+  --chart-3: #D946EF;
+  --chart-4: #EF4444;
+  --chart-5: #F59E0B;
+
+  --radius: 0.375rem; /* 6px matched to mockup */
+}
+
+/* Shadcn defaults look for these specific var names dynamically */
+.dark, :root {
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Typography Overrides */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-serif);
+  letter-spacing: -0.5px;
+}
+
+/* Fusion Components */
+.fusion-card {
+  background-color: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-fusion);
+  padding: 2rem;
+  transition: all 0.2s ease;
+  overflow: hidden;
+}
+
+.fusion-card h2 {
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Premium Skeleton & Cold Start Loader */
+.skeleton-pulse {
+  background-color: rgba(255,255,255,0.05); /* Inverted for dark mode */
+  border-radius: 4px;
+  animation: delicate-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes delicate-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.loader-text {
+  font-size: 13px; 
+  color: var(--color-muted-foreground); 
+  margin-bottom: 6px; 
+  font-weight: 500;
+  text-transform: uppercase; 
+  letter-spacing: 1px;
+  animation: fadePulse 2s infinite alternate;
+}
+
+@keyframes fadePulse { 
+  from { opacity: 0.4; } 
+  to { opacity: 1; } 
+}
+
+/* Utility Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--color-background); }
+::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-muted-foreground); }

@@ -1,0 +1,72 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: var(--bg);
+  --color-foreground: var(--text-main);
+  
+  --color-primary: var(--accent);
+  --color-primary-foreground: #000000;
+  
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--text-muted);
+  
+  --color-border: var(--border);
+
+  --font-sans: var(--font-syne), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+:root {
+  --bg: #050505;
+  --text-main: #FFFFFF;
+  --text-muted: #666666;
+  
+  /* Brutalist Neon Lime Accent vs Absolute Black */
+  --accent: #E5FF00; 
+  --border: #1a1a1a;
+  --secondary: #111111;
+  --muted: #0a0a0a;
+  
+  --status-good: #E5FF00;
+  --chart-1: #ffffff;
+  --chart-2: #888888;
+  --chart-3: #444444;
+  --chart-4: #222222;
+  --chart-5: #111111;
+}
+
+.dark, :root {
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-sans);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+  line-height: 0.9;
+}
+
+.font-data {
+  font-family: var(--font-mono);
+  letter-spacing: -0.04em;
+}
+
+/* Strip scrollbars entirely for a huge edge-to-edge feel */
+::-webkit-scrollbar { display: none; }

@@ -54,9 +54,9 @@ const PERSONAS: { value: Persona; label: string; description: string }[] = [
 ];
 
 const healthConfig = {
-  healthy: { color: "hsl(var(--healthy))", bg: "hsla(142, 71%, 45%, 0.1)", label: "Healthy" },
-  at_risk: { color: "hsl(var(--at-risk))", bg: "hsla(38, 92%, 50%, 0.1)", label: "At Risk" },
-  critical: { color: "hsl(var(--critical))", bg: "hsla(0, 79%, 63%, 0.1)", label: "Critical" },
+  healthy: { color: "var(--status-good)", bg: "rgba(47, 111, 58, 0.1)", label: "Healthy" },
+  at_risk: { color: "var(--accent)", bg: "rgba(212, 107, 35, 0.1)", label: "At Risk" },
+  critical: { color: "var(--chart-4)", bg: "rgba(166, 66, 25, 0.1)", label: "Critical" },
 };
 
 const healthIcon = {
@@ -83,29 +83,19 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen p-8" style={{ background: "hsl(var(--background))" }}>
+    <div className="min-h-screen p-8 bg-background">
       {/* Header */}
       <div className="mb-12 animate-fade-in">
         <div className="flex items-center gap-2 mb-3">
-          <div
-            className="px-3 py-1 rounded-full text-xs font-medium"
-            style={{
-              background: "hsla(217, 91%, 60%, 0.1)",
-              color: "hsl(var(--primary))",
-              border: "1px solid hsla(217, 91%, 60%, 0.2)",
-            }}
-          >
+          <div className="px-3 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary border border-primary/20">
             Revenue Command Copilot
           </div>
         </div>
-        <h1
-          className="text-4xl font-bold mb-3"
-          style={{ letterSpacing: "-0.02em" }}
-        >
+        <h1 className="text-4xl font-bold mb-3 font-serif text-foreground">
           Pipeline Health{" "}
-          <span className="gradient-text">Intelligence</span>
+          <span className="text-primary font-serif">Intelligence</span>
         </h1>
-        <p style={{ color: "hsl(var(--muted-foreground))", maxWidth: "520px", lineHeight: "1.6" }}>
+        <p className="text-muted-foreground max-w-[520px] leading-relaxed">
           Select a scenario and persona to run an AI-powered pipeline analysis.
           Watch the agent reasoning chain in real time, then explore the structured report.
         </p>
@@ -113,48 +103,35 @@ export default function HomePage() {
 
       {/* Persona Selector */}
       <div className="mb-10 animate-fade-in" style={{ animationDelay: "0.1s" }}>
-        <p
-          className="text-xs font-semibold uppercase tracking-wider mb-3"
-          style={{ color: "hsl(var(--muted-foreground))" }}
-        >
+        <p className="text-xs font-semibold uppercase tracking-wider mb-3 text-muted-foreground">
           <Users className="w-3.5 h-3.5 inline mr-1.5" />
           View as Persona
         </p>
         <div className="flex gap-2">
-          {PERSONAS.map((p) => (
-            <button
-              key={p.value}
-              onClick={() => setSelectedPersona(p.value)}
-              className="px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 text-left"
-              style={{
-                background:
-                  selectedPersona === p.value
-                    ? "hsla(217, 91%, 60%, 0.15)"
-                    : "hsl(var(--card))",
-                border:
-                  selectedPersona === p.value
-                    ? "1px solid hsla(217, 91%, 60%, 0.4)"
-                    : "1px solid var(--glass-border)",
-                color:
-                  selectedPersona === p.value
-                    ? "hsl(var(--primary))"
-                    : "hsl(var(--foreground))",
-              }}
-            >
-              <div className="font-semibold">{p.label}</div>
-              <div
-                className="text-xs mt-0.5"
-                style={{ color: "hsl(var(--muted-foreground))" }}
+          {PERSONAS.map((p) => {
+            const active = selectedPersona === p.value;
+            return (
+              <button
+                key={p.value}
+                onClick={() => setSelectedPersona(p.value)}
+                className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 text-left border ${
+                  active
+                    ? "bg-primary/10 border-primary/40 text-primary shadow-sm"
+                    : "bg-surface border-border text-foreground hover:bg-muted"
+                }`}
               >
-                {p.description}
-              </div>
-            </button>
-          ))}
+                <div className="font-semibold">{p.label}</div>
+                <div className="text-xs mt-0.5 opacity-80">
+                  {p.description}
+                </div>
+              </button>
+            );
+          })}
         </div>
       </div>
 
       {/* Scenario Cards */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 stagger">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 stagger">
         {SCENARIOS.map((scenario) => {
           const cfg = healthConfig[scenario.health];
           const Icon = healthIcon[scenario.health];
@@ -163,11 +140,7 @@ export default function HomePage() {
           return (
             <div
               key={scenario.id}
-              className="rounded-2xl p-6 hover-lift cursor-pointer group"
-              style={{
-                background: "var(--gradient-card)",
-                border: "1px solid var(--glass-border)",
-              }}
+              className="fusion-card cursor-pointer group hover:-translate-y-1 hover:shadow-[4px_6px_0px_var(--border)] transition-all"
             >
               {/* Status badge */}
               <div className="flex items-center justify-between mb-5">
@@ -178,28 +151,16 @@ export default function HomePage() {
                   <Icon className="w-3.5 h-3.5" />
                   {cfg.label}
                 </div>
-                <div
-                  className="text-xs font-medium px-2 py-1 rounded"
-                  style={{
-                    background: "hsl(var(--secondary))",
-                    color: "hsl(var(--muted-foreground))",
-                  }}
-                >
+                <div className="text-xs font-medium px-2 py-1 rounded bg-secondary text-muted-foreground">
                   {scenario.region} - {scenario.segment}
                 </div>
               </div>
 
               {/* Title */}
-              <h2
-                className="text-lg font-semibold mb-2"
-                style={{ color: "hsl(var(--foreground))" }}
-              >
+              <h2 className="text-xl font-semibold mb-2 text-foreground font-serif border-none pb-0">
                 {scenario.label}
               </h2>
-              <p
-                className="text-sm mb-5 leading-relaxed"
-                style={{ color: "hsl(var(--muted-foreground))" }}
-              >
+              <p className="text-sm mb-5 leading-relaxed text-muted-foreground">
                 {scenario.description}
               </p>
 
@@ -208,33 +169,23 @@ export default function HomePage() {
                 {scenario.tags.map((tag) => (
                   <span
                     key={tag}
-                    className="text-xs px-2.5 py-1 rounded-md font-medium"
-                    style={{
-                      background: "hsl(var(--secondary))",
-                      color: "hsl(var(--foreground))",
-                    }}
+                    className="text-xs px-2.5 py-1 rounded-md font-medium border border-border bg-white"
                   >
                     {tag}
                   </span>
                 ))}
               </div>
 
-              {/* Live chart */}
-              <div className="mb-4">
+              {/* Live chart (Placeholder or Component) */}
+              <div className="mb-8 border-t border-border pt-6">
                 <LivePipelineChart scenarioId={scenario.id} />
               </div>
 
               {/* CTA */}
               <Button
-                className="w-full group/btn"
+                className="w-full group/btn bg-foreground text-background hover:bg-primary transition-colors h-11"
                 onClick={() => handleGenerate(scenario)}
                 disabled={!!loading}
-                style={{
-                  background: isLoading ? "hsl(var(--secondary))" : "var(--gradient-brand)",
-                  border: "none",
-                  color: "white",
-                  fontWeight: 600,
-                }}
               >
                 {isLoading ? (
                   <span className="flex items-center gap-2">
@@ -242,9 +193,9 @@ export default function HomePage() {
                     Starting analysis...
                   </span>
                 ) : (
-                  <span className="flex items-center gap-2">
+                  <span className="flex items-center gap-2 font-semibold">
                     Generate Report
-                    <ChevronRight className="w-4 h-4 transition-transform group-hover/btn:translate-x-0.5" />
+                    <ChevronRight className="w-4 h-4 transition-transform group-hover/btn:translate-x-1" />
                   </span>
                 )}
               </Button>
@@ -255,26 +206,24 @@ export default function HomePage() {
 
       {/* Stats bar */}
       <div
-        className="mt-12 rounded-2xl p-6 flex items-center gap-8 animate-fade-in"
+        className="mt-12 rounded-lg p-6 flex items-center gap-8 animate-fade-in border border-border bg-card shadow-sm"
         style={{
-          background: "hsl(var(--card))",
-          border: "1px solid var(--glass-border)",
           animationDelay: "0.3s",
         }}
       >
         {[
           { label: "Agent Nodes", value: "5", icon: Zap },
-          { label: "SQL Templates", value: "5", icon: Database },
+          { label: "SQL Templates", value: "12", icon: Database },
           { label: "Guardrail Layer", value: "Active", icon: TrendingUp },
           { label: "Observability", value: "LangSmith + Logfire", icon: AlertTriangle },
         ].map(({ label, value, icon: Icon }) => (
           <div key={label} className="flex items-center gap-3">
-            <Icon className="w-4 h-4" style={{ color: "hsl(var(--primary))" }} />
+            <Icon className="w-4 h-4 text-primary" />
             <div>
-              <div className="text-xs" style={{ color: "hsl(var(--muted-foreground))" }}>
+              <div className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">
                 {label}
               </div>
-              <div className="text-sm font-semibold">{value}</div>
+              <div className="text-sm font-semibold text-foreground">{value}</div>
             </div>
           </div>
         ))}
